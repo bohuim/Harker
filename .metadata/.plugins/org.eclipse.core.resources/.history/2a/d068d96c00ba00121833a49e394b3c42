@@ -1,0 +1,105 @@
+import java.awt.Color;
+import java.util.*;
+/**
+ * 
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013 - class created & main() and directory() method added
+ *     Apr 29, 2013 - nextTurn() added
+ */
+public class Game
+{
+    
+    
+    public static void main(String[] args)
+    {
+        Board board = new Board();
+        
+        //Pawn
+//        Piece[] whitePawns = new Piece[8];
+//        for (int i=0; i<8; i++)
+//        {
+//            whitePawns[i] = (Piece) new Pawn(Color.WHITE, directory("white_pawn"));
+//            whitePawns[i].putSelfInGrid(board, new Location(6, i));
+//        }
+//        Piece[] blackPawns = new Piece[8];
+//        for (int i=0; i<8; i++)
+//        {
+//            blackPawns[i] = (Piece) new Pawn(Color.BLACK, directory("black_pawn"));
+//            blackPawns[i].putSelfInGrid(board, new Location(1, i));
+//        }
+//        //Bishop
+//        Piece blackBishop1 = (Piece) new Bishop(Color.BLACK, directory("black_bishop"));
+//        blackBishop1.putSelfInGrid(board, new Location(0, 2));
+//        Piece blackBishop2 = (Piece) new Bishop(Color.BLACK, directory("black_bishop"));
+//        blackBishop2.putSelfInGrid(board, new Location(0, 5));
+//        Piece whiteBishop1 = (Piece) new Bishop(Color.WHITE, directory("white_bishop"));
+//        whiteBishop1.putSelfInGrid(board, new Location(7, 2));
+//        Piece whiteBishop2 = (Piece) new Bishop(Color.WHITE, directory("white_bishop"));
+//        whiteBishop2.putSelfInGrid(board, new Location(7, 5));
+//        //Knight
+//        Piece blackKnight1 = (Piece) new Knight(Color.BLACK, directory("black_knight"));
+//        blackKnight1.putSelfInGrid(board, new Location(0, 1));
+//        Piece blackKnight2 = (Piece) new Knight(Color.BLACK, directory("black_knight"));
+//        blackKnight2.putSelfInGrid(board, new Location(0, 6));
+//        Piece whiteKnight1 = (Piece) new Knight(Color.WHITE, directory("white_knight"));
+//        whiteKnight1.putSelfInGrid(board, new Location(7, 1));
+//        Piece whiteKnight2 = (Piece) new Knight(Color.WHITE, directory("white_knight"));
+//        whiteKnight2.putSelfInGrid(board, new Location(7, 6));
+//        //Rook
+//        Piece blackRook1 = (Piece) new Rook(Color.BLACK, directory("black_rook"));
+//        blackRook1.putSelfInGrid(board, new Location(0, 0));
+//        Piece blackRook2 = (Piece) new Rook(Color.BLACK, directory("black_rook"));
+//        blackRook2.putSelfInGrid(board, new Location(0, 7));
+        Piece whiteRook1 = new Rook(Color.WHITE, directory("white_rook"));
+        whiteRook1.putSelfInGrid(board, new Location(7, 0));
+        Piece whiteRook2 = new Rook(Color.WHITE, directory("white_rook"));
+        whiteRook2.putSelfInGrid(board, new Location(7, 7));
+        //King
+        Piece blackKing = new King(Color.BLACK, directory("black_king"));
+        blackKing.putSelfInGrid(board, new Location(0, 4));
+        Piece whiteKing = new King(Color.WHITE, directory("white_king"));
+        whiteKing.putSelfInGrid(board, new Location(7, 4));
+        //Queen
+//        Piece blackQueen = new Queen(Color.BLACK, directory("black_queen"));
+//        blackQueen.putSelfInGrid(board, new Location(0, 3));
+//        Piece whiteQueen = new Queen(Color.WHITE, directory("white_queen"));
+//        whiteQueen.putSelfInGrid(board, new Location(7, 3));
+        
+        BoardDisplay display = new BoardDisplay(board);
+        
+        Player p1 = new HumanPlayer("Dennis", Color.WHITE, board, display);
+        Player p2 = new RandomPlayer("Damon", Color.BLACK, board);
+        //HumanPlayer("Damon", Color.BLACK, board);
+        while (true)
+        {
+            nextTurn(board, display, p1);
+            nextTurn(board, display, p2);
+        }
+    }
+    
+    private static void nextTurn(Board board, BoardDisplay display, Player player)
+    {
+        display.setTitle("Chess - " + player.getName());
+        Move nextMove = player.nextMove();
+        nextMove.execute();
+        display.switchTurn();
+        display.clearColors();
+        display.setColor(nextMove.getSource(), Color.ORANGE);
+        display.setColor(nextMove.getDestination(), Color.YELLOW);
+        try {Thread.sleep(500);} catch(InterruptedException e) {}
+    }
+    
+    private static String directory(String imgName)
+    {
+        return "C:/Google Drive/Programming/Java/Chess/images/" + imgName + ".gif";
+    }
+}

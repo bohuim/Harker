@@ -1,0 +1,164 @@
+import java.awt.*;
+import java.util.*;
+
+/**
+ * Represents a rectangular game board, containing Piece objects, through a BoundedGrid. </br></br>
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li>{@code allMove(color)} returns a set of all moves available by Pieces of specified color </li>
+ *      <li>{@code executeMove(move)} executes a move by placing the specified Piece at the destination </li>
+ *      <li>{@code undoMove(move)} reverses a move by placing the specified Piece back to source location </li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 29, 2013
+ * 
+ * @Revision
+ *     Apr 29, 2013 - class created and added allMoves()
+ */
+public class Board extends BoundedGrid<Piece>
+{
+	/**
+	 * <b>Constructor: </b>Board</br> 
+	 * <b>Usage: </b>{@code Board board = new Board()}</br>
+	 * -------------------------------</br>
+	 * Creates a new BoundedGrid of dimension 8x8, replicating a Chess board.
+	 */
+	public Board()
+	{
+		super(8, 8);
+	}
+
+	/**
+	 * <b>Method: </b>allMoves</br> 
+	 * <b>Usage: </b>{@code board.allMoves(color)}</br>
+	 * -------------------------------</br>
+	 * Returns a set of all moves possible by all Pieces of the specified color. </br>
+	 * Checks all occupied locations for the specified color and adds its possible destinations as new Moves to set. </br>
+	 * 
+	 * @param color of Pieces to get moves from
+	 * @return Set of all moves possible by Pieces of specified color
+	 */
+	public Set<Move> allMoves(Color color)
+	{
+	    Set<Move> set = new HashSet<Move>();
+	    for(Location loc : getOccupiedLocations())
+	    {
+	        Piece target = get(loc);
+	        if (target.getColor().equals(color))
+	        {
+	            Iterator<Location> it = target.destinations();
+	            while (it.hasNext())
+	                set.add(new Move(target, it.next()));
+	        }
+	    }
+	    return set;
+	}
+	
+	/**
+	 * <b>Method: </b>executeMove</br> 
+	 * <b>Usage: </b>{@code board.executeMove(move)}</br>
+	 * -------------------------------</br>
+	 * Executes given move by placing the specified Piece into destination. 
+	 * 
+	 * @param move to execute
+	 */
+	public void executeMove(Move move)
+	{
+	    Piece target = move.getPiece();
+	    Location destination = move.getDestination();
+	    target.moveTo(destination);
+	    target.moved();
+	    System.out.println("Check: " + attackingCheck(target.getColor()));
+//	    if ((target instanceof King) && (get(destination) instanceof Rook) && target.getColor().equals(get(destination)))
+//	    {
+//	        int king = 1, rook = 2;
+//	        if (destination.getCol()==7)
+//	        {
+//	            king = 6; rook = 5;
+//	        }
+//	        target.moveTo(new Location(destination.getRow(), king));
+//	        get(destination).moveTo(new Location(destination.getRow(), rook));
+//	    }
+//	    else
+//	        target.moveTo(destination);
+	}
+	
+	/**
+	 * <b>Method: </b>check</br> 
+	 * <b>Usage: </b>{@code board.check(color)}</br>
+	 * -------------------------------</br>
+	 * Returns whether King of the opposite color is in check.
+	 * 
+	 * @param color of attacking team
+	 * @return true if enemy King is in check
+	 */
+	public boolean attackingCheck(Color color)
+	{
+        for (Move m : allMoves(color))
+        {
+            Piece target = get(m.getDestination());
+            if (target instanceof King && target.getColor().equals(reverseColor(color)))
+                return true;
+        }
+        return false;
+	}
+	
+	/**
+	 * <b>Method: </b>attackedCheck</br> 
+	 * <b>Usage: </b>{@code board.attackedCheck(color)}</br>
+	 * -------------------------------</br>
+	 * Returns whether King of the given color is in check.
+	 * 
+	 * @param color of King in check
+	 * @return true if King is in check
+	 */
+	public boolean attackedCheck(Color color)
+	{
+	    for (Move m : allMoves(reverseColor(color)))
+        {
+            Piece target = get(m.getDestination());
+            if (target instanceof King && target.getColor().equals(color))
+                return true;
+        }
+        return false;
+	}
+	
+	/**
+	 * <b>Method: </b>reverseColor</br> 
+	 * <b>Usage: </b>{@code reverseColor(color)}</br>
+	 * -------------------------------</br>
+	 * Returns the reverse of the given color. 
+	 * 
+	 * @param color to flip
+	 * @return flipped color
+	 */
+	private Color reverseColor(Color color)
+	{
+        if (color.equals(Color.BLACK))
+            return Color.WHITE;
+        return Color.BLACK;
+	}
+	
+	/**
+	 * <b>Method: </b>undoMove</br> 
+	 * <b>Usage: </b>{@code Piece.undoMove()}</br>
+	 * -------------------------------</br>
+	 * Reverses an already executed move by putting specified Piece back at source & adds victim back if one existed. 
+	 * 
+	 * @param move to reverse
+	 */
+	public void undoMove(Move move)
+	{
+		Piece piece = move.getPiece();
+		Location source = move.getSource();
+		Location dest = move.getDestination();
+		Piece victim = move.getVictim();
+
+		piece.moveTo(source);
+
+		if (victim != null)
+			victim.putSelfInGrid(piece.getBoard(), dest);
+	}
+}

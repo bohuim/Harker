@@ -1,0 +1,53 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: friday
+*/
+public class friday
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new FileReader("friday.in"));
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("friday.out")));
+        
+        
+    }
+    
+    class Calendar 
+    {
+        Year[] year;
+        
+        Calendar(int years)
+        {
+            year = new Year[years];
+            for (int i=0; i<years; i++)
+                year[i] = new Year(i+1900, (i+1900)%4==0);
+        }
+    }
+    
+    class Year
+    {
+        int year;
+        boolean leap;
+        Month[] months = new Month[12];
+        
+        Year(int yr, boolean lp)
+        {
+            
+        }
+        
+    }
+    
+    class Month
+    {
+        
+    }
+    
+    class Date
+    {
+        
+    }
+}

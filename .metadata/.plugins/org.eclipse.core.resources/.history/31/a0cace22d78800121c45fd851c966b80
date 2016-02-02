@@ -1,0 +1,22 @@
+
+/**
+ * 
+ * @author Dennis Moon
+ * @version Mar 9, 2013
+ * 
+ * @Revision:
+ *     Mar 9, 2013 - class created
+ */
+public class Move
+{
+    private int start;
+    private int destination;
+    private int num;
+    
+    public Move(int s, int d, int n)
+    {
+        start = s;
+        destination = d;
+        num = n;
+    }
+}

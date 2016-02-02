@@ -1,0 +1,287 @@
+/**
+ * Class Room - a room in an adventure game.
+ *
+ * Michael Kolling's Zork code, modified to resemble MIT's 6.001 Adventure Game.
+ *
+ * This class is part of Hark. Hark is a simple, text based adventure game.
+ *
+ * "Room" represents one location in the scenery of the game.  It is
+ * connected to at most four other rooms via exits.  The exits are labeled
+ * north, east, south, west.  For each direction, the room stores a reference
+ * to the neighboring room, or null if there is no exit in that direction.
+ * 
+ * @version 0614012
+ *			Fixed generics and eliminated unnecessary typecasts
+ * @version 120915
+ *          edited and updated to part 1
+ * @version 120928
+ *          minor changes like displaying the rooms differently
+ *
+ * @author Michael Kolling
+ * @edited Part 1 - Andrew Luo, Dennis Moon
+ * @author Part 2 - Dennis Moon
+ */
+
+import java.util.ArrayList;
+
+public class Room implements ThingOwner
+{
+    private String name;
+    private Room northExit;
+    private Room eastExit;
+    private Room southExit;
+    private Room westExit;
+    private ArrayList<Person> people;
+    private ArrayList<Thing> items;
+
+    /**
+     * Create a room described "description". Initially, it has no exits.
+     * "description" is something like "a kitchen" or "an open court yard".
+     */
+    public Room(String description)
+    {
+        name = description;
+        people = new ArrayList<Person>();
+        items = new ArrayList<Thing>();
+    }
+
+    /**
+     * Define the exits of this room.  Every direction either leads to
+     * another room or is null (no exit there).
+     */
+    public void setExits(Room north, Room east, Room south, Room west)
+    {
+        northExit = north;
+        eastExit = east;
+        southExit = south;
+        westExit = west;
+    }
+
+    /**
+     * Return the description of the room (the one that was defined in the
+     * constructor).
+     */
+    public String getName()
+    {
+        return name;
+    }
+
+    /**
+     * Return a long description of this room, of the form:
+     *     You are in the kitchen.
+     *     Exits: north west
+     */
+    public String longDescription()
+    {
+        return "You are at " + name + ".\n" + exitString() + "\n" + otherPeopleString() + "\n" + thingString();
+    }
+
+    /**
+     * Return a string describing the room's exits, for example
+     * "Exits: north west ".
+     */
+    private String exitString()
+    {
+        String returnString = "Exits:";
+
+        if (northExit != null)
+            returnString = returnString + " north";
+        if (eastExit != null)
+            returnString = returnString + " east";
+        if (southExit != null)
+            returnString = returnString + " south";
+        if (westExit != null)
+            returnString = returnString + " west";
+
+        return returnString;
+    }
+    
+    /**
+     * Returns a string listing all the other people in the room
+     * @return returnString - list of all people
+     */
+    public String otherPeopleString()
+    {
+        if (people.size() == 1)
+            return "No one is here.";
+
+        String returnString = "People here:";
+
+        for (int i = 0; i < people.size(); i++)
+        {
+            Person person = people.get(i);
+            String type = "MON";
+            if (person.getType()==Person.ROBOT)
+                type = "ROB";
+            
+            if (person.getType() != Person.HERO)
+                returnString = returnString + " " + person.getName() + "(Lv." + person.getLevel()+ ", " + type + "), ";
+        }
+
+        return returnString;
+    }
+    
+    
+    /**
+     * Return a string listing all things in the room
+     * 
+     * @return returnThing - string of all things in the room
+     */
+    public String thingString()
+    {	
+        
+    	String returnThing = "Items (Room): ";
+    	returnThing += Game.makeQuantityList(items);
+    	
+    	return returnThing;
+    }
+
+    /**
+     * Return the room that is reached if we go from this room in direction
+     * "direction". If there is no room in that direction, return null.
+     */
+    public Room nextRoom(String direction)
+    {
+        if (direction.equals("north"))
+            return northExit;
+        else if (direction.equals("east"))
+            return eastExit;
+        else if (direction.equals("south"))
+            return southExit;
+        else if (direction.equals("west"))
+            return westExit;
+        else
+            return null;
+    }
+
+    /**
+     * Adds given person to arraylist of people
+     * @param person - person that is added to this rrom
+     */
+    //adds the given person to the room
+    public void add(Person person)
+    {
+        people.add(person);
+    }
+    
+    
+    /**
+     * add(Thing thing) adds thing to list of things into this room
+     * 
+     * @param thing - adds given thing to list of things in the room
+     */
+    public void add(Thing newThing)
+    {
+    	items.add(newThing);
+    }
+
+    //precondition:  person must be in the room
+    //postcondition: person has been removed from the room
+    public void remove(Person person)
+    {
+        boolean found = false;
+        for (int i = 0; i < people.size() && !found; i++)
+        {
+            if (people.get(i) == person)
+            {
+                people.remove(i);
+                found = true;
+            }
+        }
+
+        if(!found) throw new IllegalArgumentException("Person not found:  " + person);
+    }
+    
+    
+    /**
+     * remove(Thing thing) removes given thing from items list of this room
+     * 
+     * @param thing - removes this thing from items list of this room
+     */
+    public void remove(Thing aThing)
+    {
+        boolean found = false;
+        for (int i = 0; i < items.size() && !found; i++)
+        {
+            if (items.get(i) == aThing)
+            {
+                items.remove(i);
+                found = true;
+            }
+        }
+
+        if(!found) throw new IllegalArgumentException("Item not found:  " + aThing);
+    }
+
+    //precondition:  room contains at least one person
+    //postcondition: returns a random person in the room
+    public Person getRandomPerson()
+    {
+        int index = Game.random(people.size());
+        return (Person)people.get(index);
+    }
+    
+    /**
+     * Returns copied arraylist of people in the room
+     * 
+     * @return peopleNames - copied version of arraylist of people only
+     */
+    public ArrayList<Person> getPeople()
+    {
+    	ArrayList<Person> peopleList = new ArrayList<Person>();
+    	
+    	for (int i=0; i<people.size(); i++)
+    		peopleList.add(people.get(i));
+    	return peopleList;
+    }
+    
+    /**
+    * getThing() goes through all the thing in the room (not the people's) to check if given string matches name of an item
+    * and it returns the item
+    * 
+    * @param n - name of the item hero wants
+    * @return t - thing user wants
+    */
+    public Thing getThing(String n)
+    {
+    	for (Thing t:items)
+    	{
+    		if(n.equals(t.getName().toLowerCase()))
+    			return t;
+    	}
+    	return null;
+    }
+    
+    /**
+     * getRandomThing uses Game's random() to get a random index and return a thing of that index from the ArrayList of things in the room
+     * 
+     * @return a random thing from the room
+     */
+    public Thing getRandomThing()
+    {
+    	int index = Game.random(getAllThings().size());
+    	if (index != 0)
+    		return getAllThings().get(index);
+    	return null;
+    }
+    
+    /**
+     * getAllThings returns everything, including people's items, 
+     * 
+     * @return everything in the room
+     */
+    public ArrayList<Thing> getAllThings()
+    {
+    	ArrayList<Thing> everything = new ArrayList<Thing>();
+    	
+    	for (Thing t: items)
+    		everything.add(t);
+    	
+    	for (int i=0; i<people.size(); i++)
+    	{
+    		for(Thing p : people.get(i).getThings())
+    			everything.add(p);
+    	}
+    	return everything;
+    }
+}

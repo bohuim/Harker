@@ -1,0 +1,12 @@
+import java.awt.Color;
+
+public class Shadow extends Tetrad
+{
+
+    public Shadow(MyBoundedGrid<Block> grid)
+    {
+        super(grid);
+        setColor(Color.BLACK);
+    }
+
+}

@@ -1,0 +1,40 @@
+
+//A simple calculator class
+//
+//@author Dennis Moon
+public class Calculator
+{
+    
+//    Method: add()
+//    Usage: calc.add(x,y)
+//    
+//    @param x - first num
+//    @param y - num added to x
+//    @return x+y
+    public add (x, y)
+    {
+        return x+y;
+    }
+
+//    Method: subtract()
+//    Usage: calc.subtract(x,y)
+//    
+//    @param x - first num
+//    @param y - num subtracted from x
+//    @return x-y
+    public subtract (x, y)
+    {
+        return x-y;
+    }
+
+    Method: multiply()
+    Usage: multiply(x,y)
+    
+//    @param x - first num
+//    @param y - num multiplied to x
+//    @return x*y
+    public multiply (x, y)
+    {
+        return x*y;
+    }
+}

@@ -1,0 +1,73 @@
+
+/**
+ * Write a description of class GuitarString here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+public class GuitarString
+{
+    public RingBuffer buffer;    
+    
+    private int capacity;
+    private double currentSample;
+    private int ticCount;
+    
+    public static final int SAMPLE_RATE = 44100;
+
+    /**create a quitar string of the given frequency
+     */
+    public GuitarString(double frequency) 
+    {
+        capacity = (int) (SAMPLE_RATE/frequency + 0.5);
+        buffer = new RingBuffer(capacity);
+    }
+    
+    /** create a guitar string whose size and initial values are given by the arrary
+     */
+    public GuitarString(double[] init) 
+    {
+        capacity = init.length;
+        buffer = new RingBuffer(capacity);
+    }
+    
+    /** set the buffer to white noise
+     */
+    public void pluck() 
+    {
+        for (int i = 0; i < capacity; i++)
+            buffer.enqueue (Math.random() - 0.5);
+    }
+    
+    /** advance the simulation one time step
+     */
+    public void tic() 
+    {
+        buffer.enqueue(0.996*(buffer.dequeue() + buffer.peek())/2);
+        ticCount++;
+    }
+    
+    /** return the current sample
+     */
+    public double sample() 
+    {
+        return buffer.peek();
+    }
+    
+    /** return number of tics
+     */
+    public int time()
+    {
+        return ticCount;
+    }
+    
+    public void playNote()
+    {
+        pluck();
+        for (int i = 0; i < 9999; i++)
+        {
+            tic();
+            AudioLib.play(sample());
+        }
+    }
+}

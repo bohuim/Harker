@@ -1,0 +1,23 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+
+
+/**
+ * 
+ * @author Dennis Moon
+ * @version Mar 16, 2013
+ * 
+ * @Revision:
+ *     Mar 16, 2013
+ */
+class MainC
+{
+    public static void main(String[] args) throws Exception
+    {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        String input = br.readLine();
+        input = input.split(" ");
+        
+    }
+}

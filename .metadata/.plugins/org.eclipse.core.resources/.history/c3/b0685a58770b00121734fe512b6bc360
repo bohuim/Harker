@@ -1,0 +1,136 @@
+/**
+ * A class that can make and play multiple guitar strings
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.Label;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+public class Instrument implements Runnable
+{   
+    /**Keyboard layout
+     * 
+     * Notes:C  C#  D  D#  E  F  F#  G  G#  A  Bb  B  C  C#  D  D#  E
+     * Keys: a  w   s  e   d  f  t   g  y   h  u   j  k  o   l  p   ;
+     */
+    
+    private double sum;
+    private Note[] note;
+    
+    private Frame frame;
+    private Label label;
+    
+    public Instrument(String name)
+    {
+    	sum = 0;
+    	note = new Note[13];
+    	for (int i=0; i<note.length; i++)
+    	    note[i] = new Note(i+3,3);
+    	
+    	
+    	frame = new Frame(name);
+    	label = new Label();
+    	frame.addKeyListener(new KeyListener()
+    	{
+    	    public void keyPressed(KeyEvent e)
+    	    {
+    	        char c = e.getKeyChar();
+    	        String str = Character.toString(c);
+    	        label.setText(convertKey(str));
+    	        playNote(str);
+    	    }
+
+    	    public void keyTyped(KeyEvent e)
+    	    {
+
+    	    }
+    	    
+    	    public void keyReleased(KeyEvent e) {}
+    	}
+    	);
+        frame.add(label, BorderLayout.CENTER);
+        frame.addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent we)
+            {
+                System.exit(0);
+            }
+        }
+        );
+        frame.setSize(1200,200);
+        frame.setVisible(true);
+        frame.setFocusable(true);
+    }
+   
+    /**
+     * converts the key into the note and plucks it
+     * 
+     * @param h - key the player pressed
+     */
+    public void playNote(String h)
+    {
+        if (h.equals("a")) note[0].pluck();
+        else if (h.equals("w")) note[1].pluck();
+        else if (h.equals("s")) note[2].pluck();
+        else if (h.equals("e")) note[3].pluck();
+        else if (h.equals("d")) note[4].pluck();
+        else if (h.equals("f")) note[5].pluck();
+        else if (h.equals("t")) note[6].pluck();
+        else if (h.equals("g")) note[7].pluck();
+        else if (h.equals("y")) note[8].pluck();
+        else if (h.equals("h")) note[9].pluck();
+        else if (h.equals("u")) note[10].pluck();
+        else if (h.equals("j")) note[11].pluck();
+        else if (h.equals("k")) note[12].pluck();
+    }
+    
+    private String convertKey(String h)
+    {
+        if (h.equals("a")) return "C";
+        else if (h.equals("w")) return "C#";
+        else if (h.equals("s")) return "D";
+        else if (h.equals("e")) return "D#";
+        else if (h.equals("d")) return "E";
+        else if (h.equals("f")) return "F";
+        else if (h.equals("t")) return "F#";
+        else if (h.equals("g")) return "G";
+        else if (h.equals("y")) return "G#";
+        else if (h.equals("h")) return "A";
+        else if (h.equals("u")) return "Bb";
+        else if (h.equals("j")) return "B";
+        else if (h.equals("k")) return "C";
+        return "?";
+    }
+    
+    private void update()
+    {
+        sum = 0;
+        for (int i=0; i<note.length; i++)
+        {
+            note[i].tic();
+            sum += note[i].sample();
+            if (note[i].time()>120000)
+                note[i].silence();
+        }
+    }
+    
+    /**constantly run in a separate thread
+     * it calls update
+     * then plays the sum update changed it
+     * @param none
+     * @return none
+     */
+    public void run()
+    {
+    	while (true)
+    	{
+    		update();
+    		AudioLib.play(sum);
+    	}
+    }
+}

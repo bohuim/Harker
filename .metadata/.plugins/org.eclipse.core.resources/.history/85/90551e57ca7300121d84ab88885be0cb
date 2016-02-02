@@ -1,0 +1,104 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: gift1
+*/
+public class gift1
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new FileReader("gift1.in"));
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("gift1.out")));
+        
+        int n = Integer.parseInt(f.readLine());
+        gift1 g = new gift1();
+        String[] names = new String[n];
+        Person[] list = new Person[n];
+        
+        for (int i=0; i<n; i++)
+            names[0] = f.readLine();
+        for (int i=0; i<n; i++)
+        {
+            String name = f.readLine();
+            String[] stat = f.readLine().split(" ");
+            int money = Integer.parseInt(stat[0]);
+            int giving = Integer.parseInt(stat[1]);
+            list[i] = g.newPerson(name, money, giving);
+            for (int x=0; x<giving; x++)
+                list[i].addRecepient(f.readLine());
+        }
+        
+        for (Person p : list)
+            p.give(list);
+        for (String name : names)
+            for (Person p : list)
+                if (p.getName().equals(name))
+                    out.println(p.result());
+        out.close();
+        System.exit(0);
+    }
+    
+    public Person newPerson(String name, int dollar, int ppl)
+    {
+        return new Person(name, dollar, ppl);
+    }
+    
+    class Person
+    {
+        String name;
+        ArrayList<String> recepients;
+        int gift;
+        int initial, current;
+        
+        Person(String name, int money, int ppl)
+        {
+            this.name = name;
+            initial = money;
+            current = money;
+            if (ppl!=0)
+                gift = (int) money/ppl;
+            else 
+                gift = 0;
+            recepients = new ArrayList<String>();
+        }
+        
+        String getName()
+        {
+            return name;
+        }
+        
+        void addRecepient(String name)
+        {
+            recepients.add(name);
+        }
+        
+        void got(int money)
+        {
+            current += money;
+        }
+        
+        void give(Person[] list)
+        {
+            for (Person p : list)
+                if (recepients.contains(p.getName()))
+                {
+                    current -= gift;
+                    p.got(gift);
+                }
+        }
+        
+        String result()
+        {
+            int finalM = current - initial;
+            return name + " " + finalM;
+        }
+    }
+}

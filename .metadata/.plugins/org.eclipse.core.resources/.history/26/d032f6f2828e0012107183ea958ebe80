@@ -1,0 +1,78 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+
+
+/**
+ * 
+ * @author Dennis Moon
+ * @version Mar 16, 2013
+ * 
+ * @Revision:
+ *     Mar 16, 2013
+ */
+class MainC
+{
+    static int ADD = 0;
+    static int SUBTRACT = 1;
+    static int MULTIPLY = 2;
+    static int DIVIDE = 3;
+    
+    public static void main(String[] args) throws Exception
+    {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        String  str = br.readLine();
+        String[] input = str.split(" ");
+        
+        ArrayList<String> list = new ArrayList<String>();
+        for(int i = 0; i < input.length; i++)
+            list.add(input[i]);
+        
+        shed(list);
+        float ans = calc(list);
+    }
+    
+    public static void shed(ArrayList<String> list)
+    {
+        if (list.get(0).equals("(") && list.get(list.size()-1).equals(")"))
+        {
+            list.remove(list.size()-1);
+            list.remove(0);
+            shed(list);
+        }
+    }
+    
+    public static float calc(ArrayList<String> list)
+    {
+        if (list.contains("("))
+        {
+            if (list.get(0).equals("("))
+            {
+                
+            }
+            else
+            {
+                
+            }
+        }
+        else
+            return eval(list.get(0), list.get(2), list.get(1));
+    }
+    
+    public static float eval(String a, String b, String op) 
+    {
+        float n1 = Integer.parseInt(a);
+        float n2 = Integer.parseInt(b);
+        
+        if(op.equals("+"))
+            return n1 + n2;
+        else if(op.equals("-"))
+            return n1 - n2;
+        else if(op.equals("*"))
+            return n1 * n2;
+        else if(op.equals("/"))
+            return n1 / n2;
+        return 0; 
+    }
+}

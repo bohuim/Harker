@@ -1,0 +1,53 @@
+/**
+ * Rectangle was created for the purpose of testing hashing methods and HashSets; therefore a Rectangle does not perform any actions. </br>
+ * It contains int instance fields {@code length} and {@code width} along with getter methods, {@code equals()}, and {@code hashCode()}. </br>
+ * 
+ * <b>Methods</b>
+ * <ul>
+ *  <li>{@code getLength()} returns the length of Rectangle </li>
+ *  <li>{@code getWidth()} returns the width of Rectangle </li>
+ *  <li>{@code equals()} returns true only if Rectangles have same length & width </li>
+ * 
+ * @author Dennis Moon
+ * @version Apr 10, 2013
+ * 
+ * @Revision
+ *     Apr 10, 2013
+ */
+public class Rectangle
+{
+	private int length;
+	private int width;
+
+	public Rectangle(int len, int w)
+	{
+		length = len;
+		width = w;
+	}
+
+	public int getLength()
+	{
+		return length;
+	}
+
+	public int getWidth()
+	{
+		return width;
+	}
+	
+	public boolean equals(Object obj)
+	{
+	    Rectangle comp = (Rectangle)obj;
+	    return length==comp.getLength() && width==comp.getWidth();
+	}
+	
+	public int hashCode()
+	{
+	    return length*31 + width*37;
+	}
+
+	public String toString()
+	{
+		return length + "x" + width;
+	}
+}

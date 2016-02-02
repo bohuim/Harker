@@ -1,0 +1,20 @@
+import java.util.*;
+
+public class Play 
+{	
+	public static void main (String [] args)
+	{
+	    Instrument piano = new Instrument();
+	    Keyboard keyboard = new Keyboard(piano);
+	    
+	    Note C = new Note(48);
+	    C.pluck();
+	    while (true)
+	    {
+	        double sample = C.sample();
+	        AudioLib.play(sample);
+	        System.out.println(sample);
+	        C.tic();
+	    }
+	}
+}

@@ -1,0 +1,176 @@
+import java.awt.*;
+/**
+ * A class that can make and play multiple guitar strings
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+public class Instrument implements Runnable
+{   
+    /**Keyboard layout
+     * 
+     * Notes:C  C#  D  D#  E  F  F#  G  G#  A  Bb  B  C  C#  D  D#  E
+     * Keys: a  w   s  e   d  f  t   g  y   h  u   j  k  o   l  p   ;
+     */
+    
+    private double sum;
+    private Note[] note;
+    
+    public Instrument()
+    {   
+    	sum = 0;
+    	note = new Note[88];
+    	for (int i=0; i<note.length; i++)
+    	    note[i] = new Note(i);
+    }
+   
+    /**
+     * Method: playNote(keyBoardKey)
+     * Usage: instrument.playNote(keyCharacter);
+     * --------------------------------------------
+     * converts the key into the note and plucks it
+     * @param h - key the player pressed
+     */
+    public void playNote(String h)
+    {
+        if (h.equals("a")) note[39].pluck();
+        else if (h.equals("w")) note[40].pluck();
+        else if (h.equals("s")) note[41].pluck();
+        else if (h.equals("e")) note[42].pluck();
+        else if (h.equals("d")) note[43].pluck();
+        else if (h.equals("f")) note[44].pluck();
+        else if (h.equals("t")) note[45].pluck();
+        else if (h.equals("g")) note[46].pluck();
+        else if (h.equals("y")) note[47].pluck();
+        else if (h.equals("h")) note[48].pluck();
+        else if (h.equals("u")) note[49].pluck();
+        else if (h.equals("j")) note[50].pluck();
+        else if (h.equals("k")) note[51].pluck();
+    }
+    
+    /**
+     * Method: playNote(int)
+     * Usage: instrument.playNote(keyIndex;
+     * --------------------------------------------
+     * converts the key into the note and plucks it
+     * @param h - key the player pressed
+     */
+    public void playNote(int i)
+    {
+        note[i].pluck();
+    }
+    
+    /**
+     * Method: convertToNoteName(keyBoardKey)
+     * Usage: String noteName = instrument.convertToNoteName(keyBoardKey);
+     * ---------------------------------------------------------------------
+     * converts the keyboard key to its note name
+     * @param h - name of keyboard key
+     * @return note name
+     */
+    public String convertToNoteName(String h)
+    {
+        if (h.equals("a")) return "C";
+        else if (h.equals("w")) return "C#";
+        else if (h.equals("s")) return "D";
+        else if (h.equals("e")) return "D#";
+        else if (h.equals("d")) return "E";
+        else if (h.equals("f")) return "F";
+        else if (h.equals("t")) return "F#";
+        else if (h.equals("g")) return "G";
+        else if (h.equals("y")) return "G#";
+        else if (h.equals("h")) return "A";
+        else if (h.equals("u")) return "Bb";
+        else if (h.equals("j")) return "B";
+        else if (h.equals("k")) return "C";
+        return "?";
+    }
+    
+    /**
+     * Method: convertToNoteName(keyBoardKey)
+     * Usage: String noteName = instrument.convertToNoteName(keyBoardKey);
+     * ---------------------------------------------------------------------
+     * converts the keyboard key to its note name
+     * @param h - name of keyboard key
+     * @return note name
+     */
+    public String convertToNoteName(int i)
+    {
+        if (i%12==0 || i==0) return "A";
+        else if (i%12==1 || i==1) return "A#/Bb";
+        else if (i%12==2 || i==2) return "B";
+        else if (i%12==3 || i==3) return "C";
+        else if (i%12==4 || i==4) return "C#/Db";
+        else if (i%12==5 || i==5) return "D";
+        else if (i%12==6 || i==6) return "D#/Eb";
+        else if (i%12==7 || i==7) return "E";
+        else if (i%12==8 || i==8) return "F";
+        else if (i%12==9 || i==9) return "F#/Gb";
+        else if (i%12==10 || i==10) return "G";
+        else if (i%12==11 || i==11) return "G#/Ab";
+        return "?";
+    }
+    
+    /**
+     * Method: findNote(keyBoardKey)
+     * Usage: Note note = instrument.findNote(keyBoardKey);
+     * ---------------------------------------------------
+     * @param h - name of keyboard key
+     * @return note assigned at that key
+     */
+    public int findNoteIndex(String h)
+    {
+        if (h.equals("a")) return 39;
+        else if (h.equals("w")) return 40;
+        else if (h.equals("s")) return 41;
+        else if (h.equals("e")) return 42;
+        else if (h.equals("d")) return 43;
+        else if (h.equals("f")) return 44;
+        else if (h.equals("t")) return 45;
+        else if (h.equals("g")) return 46;
+        else if (h.equals("y")) return 47;
+        else if (h.equals("h")) return 48;
+        else if (h.equals("u")) return 49;
+        else if (h.equals("j")) return 50;
+        else if (h.equals("k")) return 51;
+        return -1;
+    }
+    
+    /**
+     * Method: update()
+     * Usage: update();
+     * --------------------------
+     * updates all the notes by first setting sum to 0
+     * and tics all notes and adds its samples to sum
+     */
+    private void update()
+    {
+        sum = 0;
+        for (int i=0; i<note.length; i++)
+        {
+            note[i].tic();
+            sum += note[i].sample();
+            if (note[i].time()>100000)
+                note[i].silence();
+        }
+    }
+    
+    /**
+     * Method: run()
+     * Usage: new Thread(piano).start();
+     * -------------------------------------
+     * constantly run in a separate thread by calling update
+     * then plays the sum update changed it
+     * @param none
+     * @return none
+     */
+    public void run()
+    {
+    	while (true)
+    	{
+    		update();
+    		AudioLib.play(sum);
+    		//System.out.println(sum);
+    	}
+    }
+}

@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Solitaire">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Solitaire.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

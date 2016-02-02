@@ -1,0 +1,539 @@
+
+/**
+ * Write a description of class WordGame here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+import java.io.*;
+import java.util.Random;
+
+public class WordGame extends WordGameDisplay
+{
+    Random generator = new Random();
+    
+    // instance variables 
+    private String userInput = "";
+    private String input = "";
+    private String output = "";
+    private String history = "";
+    private int submitCount = 1;
+    
+    private String reverseString = "";
+    
+    private String giantString = "";
+    private int giantStringIndex = 0;
+    private String searchWord = "";
+    private int numberOfWords = 0;
+    private int countIndex = 0;
+    
+    private int chancesLeft;
+    private String guessField;
+    private int random;
+    private int wordIndex;
+    private boolean letterAppears;
+    private String usedField;
+    private String[] wordLetters;
+    private String[] usedLetters;
+ 
+  //constants
+    private static final String BASIC_HANGMAN_MESSAGE = "Guess a Letter or the Word" + "\n" + "Guessing a Word wrong will cost you 2 chances!" + "\n";
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    
+    private static final String[] word = new String[20]; 
+    {
+        word[0] = "music";
+        word[1] = "television";
+        word[2] = "cello";
+        word[3] = "guitar";
+        word[4] = "pillow";
+        word[5] = "sofa";
+        word[6] = "stand";
+        word[7] = "bow";
+        word[8] = "laptop";
+        word[9] = "windows";
+        word[9] = "java";
+        word[10] = "computers";
+        word[11] = "science";
+        word[12] = "running";
+        word[13] = "comedy";
+        word[14] = "romance";
+        word[15] = "drawing";
+        word[16] = "soccer";
+        word[17] = "movie";
+        word[18] = "drama";
+        word[19] = "food";
+    }
+    
+    /**
+     * the echo game method
+     * 
+     * @param  y   a sample parameter for a method
+     * 
+     */
+    public void echo()
+    {
+        setTitle("The Echo Game");
+        history = "" + "Echo Game" + "\n" + "Please Enter a Word";
+        setText(history);
+        while (continueGame())
+        {
+            userInput = getGuess();
+            
+            	history = history + "\n" + submitCount + ". " + "\"" + userInput + "\" is a word" + "\n" + "Please Enter a Word";
+            	setText(history);
+            
+            submitCount++;
+        }
+    }
+    
+    
+    /**
+     * 
+     * converts an input string into with only lower case letters and returns a output string
+     */
+    private String onlyLetters()
+    {
+        input = userInput.toLowerCase();
+        for (int i = 0; i<input.length(); i++)
+        {
+            int diff = input.substring(i,i+1).compareTo("a");
+            if (diff >= 0 && diff <= 25)
+                output = output + input.substring(i,i+1);
+        }
+        return output;
+    }
+    /**
+     * runs the lower case letters program
+     */
+     public void lowerCaseLetters()
+    {
+        setTitle("Only Lower Case");
+        history = "" + "Lower Case Converter" + "\n" + "Please Enter a String";
+        setText(history);
+        while (continueGame())
+        {
+        	userInput = getGuess().toLowerCase();
+        	history = history + "\n" + submitCount + ". " + onlyLetters() + "\n" + "Please Enter Another String"; 
+        	setText(history);
+        	output = "";
+        	submitCount++;
+        }
+    }
+    
+ 
+    /**
+     * checks if an input string is a palindrome or not, returns accordingly 
+     */
+    private boolean isPalindrome()
+    {
+        if (input.length() == 1)
+            return true;
+        else 
+        {
+            assembleBackwards();
+            if (reverseString.equals(input))
+            {
+                reverseString = "";
+                return true;
+            }
+            reverseString = "";
+        }
+        return false;
+    }
+    /**
+     * reassembles an input string backwards into a string named reverseString
+     */
+    private void assembleBackwards()
+    {
+        for (int i = input.length(); i >= 1; i--)
+            reverseString = reverseString + input.substring(i-1,i);
+    }
+    /**
+     * takes a input: converts it into lower case letters, then checks the input with its reverseString
+     * 
+     */
+    public void palindrome()
+    {
+        setTitle("Palindrome");
+    	userInput = " ";
+    	history = "" + "Panlindrome" + "\n" + "Please Enter a Palindrome or Nothing to Stop Playing";
+        setText(history);
+        while (continueGame())
+        {
+        	userInput = getGuess();
+            onlyLetters();
+            input = output;
+            if (userInput.equals("stop playing") || userInput.equals("another game")) history = "";
+            else if (userInput.length()==0) 
+            	history = history + "\n" + "End of Palindrome";
+            else if (isPalindrome())
+            	history = history + "\n" + submitCount + ". " + "\"" + userInput + "\"" + " is a palindrome";
+            else
+                history = history + "\n" + submitCount + ". " + "\"" + userInput + "\"" + " is not a palindrome";
+            setText(history);
+            submitCount++;
+            output = "";
+        }
+    }
+    
+    
+    
+   /**
+       * readInput takes in a string containing a file name and
+       * then wraps a BufferedReader around a FileReader for that
+       * file. If the file is not found, or any other IO error
+       * occurs, an exception is thrown.
+       * @param filename is the input file name
+       * @return a String containing the input data
+    */
+    private String readInput(String fileName)
+    {
+        try
+        {
+            BufferedReader in = new BufferedReader(new FileReader(fileName));
+            // read a line of text into the variable line
+            // end of line characters are discarded
+            // you may want to put them back!
+            String line = in.readLine();
+            String lines ="";
+            while (line != null)
+            {
+                lines = lines + line;// add code to append line to lines
+                line = in.readLine();
+            }
+            in.close();
+            return lines;
+        }
+        // in case of error ...
+        catch(IOException e)
+        {
+            RuntimeException up = new RuntimeException(e);
+            throw up;
+        }
+    }    
+    /** countOccurrences converts the word entered by the user to lower case 
+     * and runs countWords
+     * It takes the int containing the number of occurrences and returns it
+     * @param none
+     * @return int with number of occurrences
+     */
+    private int countOccurrences()
+    {
+        searchWord = userInput.toLowerCase();
+        countWords();
+        giantStringIndex = 0;
+        return numberOfWords;
+     }
+    /** countWords compares the text file and the user input 
+     * and adds 1 to numberOfWords every time it finds 
+     * a matching word in the text file
+     *@param none
+     *@return none
+     */
+    private void countWords()
+    {
+ 	   while (giantStringIndex < giantString.length()-searchWord.length())
+ 	   {
+ 		   while (giantStringIndex < giantString.length()-searchWord.length() && !searchWord.substring(0,1).equals(giantString.substring(giantStringIndex,giantStringIndex+1)))
+ 			   giantStringIndex++;
+ 		   
+ 		   giantStringIndex++;
+ 		   for (int i = 1; i < searchWord.length(); i++)
+ 		   {
+ 			   if (searchWord.substring(i,i+1).equals(giantString.substring(giantStringIndex,giantStringIndex+1)))
+ 			   {
+ 				   giantStringIndex++;
+ 				   countIndex++;
+ 			   }
+ 		   }
+ 		   if(countIndex+1==searchWord.length()) numberOfWords++;
+ 		   countIndex = 0;
+ 	   }
+     }
+    /** countIt is the actual game method
+     *It sets the title and initial message and runs the game
+     *It receives int numberOfWords and sets text accordingly
+     *@param none
+     *@return none
+     */
+    public void countIt()
+    {
+ 	   history = "" + "Count Occurrences" + "\n" + "Please Enter a File Location";
+ 	   setText(history);
+ 	   userInput = getGuess();
+	   if (continueGame())
+	   {
+ 	   	   giantString = readInput(userInput).toLowerCase(); //C:/Users/Dennis/Dropbox/Programming/Java/WordGame/bin/testDoc.txt
+	 	   history = history + "\n" + "Processing file..." + "\n" + "Please Enter a Word";
+	 	   setText(history);
+	 	   while (continueGame())
+	 	   {
+	 	       userInput = getGuess();
+	 	       history = history + "\n" + submitCount + ". " + "\"" + userInput + "\"" + " occurs " + countOccurrences() + " times."
+	 	       + "\n" + "Please Enter a Word";
+	 	       setText(history);
+	 	       submitCount++;
+	 	       numberOfWords = 0;
+	 	   }
+	   }
+    }
+    
+    /** masterGame sets the title as "Word Games"
+     *and runs callGame until user wants to stop playing,
+     *upon which it sets the text as "Game Over"
+     *@param none
+     *@return noen
+     */
+    public void masterGame()
+    {
+    	setTitle("Word Games");
+    	while (!userInput.equals("stop playing")) callGame();
+    	setText("Game Over!");
+    }
+    /** callGame calls the game the user wants
+     *and each game is modified to exit the game when the 
+     *user wants to play another game, upon which 
+     *callGame asks to enter the name of a game again
+     *@param none
+     *@return none
+     */
+    private void callGame()
+    {
+    	submitCount = 1;
+    	
+    	history = "" + "Select a Game:" + "\n" 
+    	            + "   1. Echo Game" + "\n" 
+    	            + "   2. Lower Case Converter" + "\n" 
+    	            + "   3. Palindrome Checker" + "\n"
+    	            + "   4. Word Count" + "\n" 
+    	            + "   5. Hangman" + "\n"
+    	            + "Type " + "\"" + "Another Game" + "\"" + " or " + "\"" + " Stop Playing" + "\"" + " at anytime";
+    	setText(history);
+    	
+    	userInput = getGuess().toLowerCase();
+    	if (userInput.equals("echo") || userInput.equals("echo game")) echo();
+    	else if (userInput.equals("lower case") || userInput.equals("lower case converter")) lowerCaseLetters();
+    	else if (userInput.equals("palindrome") || userInput.equals("palindrome checker")) palindrome();
+    	else if (userInput.equals("word count") || userInput.equals("count")) countIt();
+    	else if (userInput.equals("hangman")) hangman();
+    	else if (userInput.equals("another game")) callGame();
+    	else if (userInput.equals("stop playing")) {}
+    	else
+    	{
+    		history = "" + "Sorry! You Entered an Unrecognized Command!" + "\n" + "Press Enter";
+    		setText(history);
+    		getGuess(); //to pause
+    	}
+    }
+    public boolean continueGame()
+    {
+        if (!userInput.toLowerCase().equals("another game") && !userInput.equals("stop playing")) 
+            return true;
+        return false;
+    }
+    
+    
+    /** hangman sets the title as "Hangman"
+     * initializes all the variables needed
+     * @param none
+     * @return none
+     */
+    public void hangman()
+    {
+        setTitle("Hangman");
+        
+        resetHangman();
+        setText(history);
+        
+        while (continueGame())
+            guessWord();
+    }
+    /**resetHangman resets all values used in hangman
+     * @param
+     * @return
+     */
+    private void resetHangman()
+    {
+        chancesLeft = 10;
+        guessField = "";
+        wordIndex = 0;
+        userInput = "";
+        guessField = "";
+        usedField = "";
+        random = generator.nextInt(20);
+        
+        wordLetters = new String[word[random].length()];
+        usedLetters = new String [26];
+        
+        for (int i = 0; i < word[random].length(); i++)
+            wordLetters[i] = "_ ";
+        for (int i = 0; i < word[random].length(); i++)
+            guessField = guessField + wordLetters[i] + " ";
+        
+        for (int i = 0; i < ALPHABET.length(); i++)
+            usedLetters[i] = "";
+        for (int i = 0; i < ALPHABET.length(); i++)
+            usedField = usedField + usedLetters[i];
+        
+        history = BASIC_HANGMAN_MESSAGE 
+                + "\n"
+                + "Letters used: " + usedField + "\n"
+                + "Chances Left: " + chancesLeft + "\n"
+                + guessField;
+    }
+    
+    /**guessWord takes in the user's input
+     * and runs either checkLetter or checkString, then
+     * it sets the guessField and text accordingly
+     * @param none
+     * @return none
+     */
+    private void guessWord()
+    {
+        if (chancesLeft > 0 && !userInput.equals(word[random]))
+        {
+            userInput = getGuess();
+            guessField = "";
+            
+            if (userInput.length() == 1) checkLetter();
+            else checkString();
+            
+            
+        }
+    }
+    /** checkLetter compares the user input letter
+     * to the letters of the word and replaces "_ "
+     * with the letter if they match
+     * @param none
+     * @return none
+     */
+    private void checkLetter()
+    {
+        updateUsedLetters();
+        
+        letterAppears = false;
+        while (wordIndex < word[random].length())
+        {
+            if (userInput.equals(word[random].substring(wordIndex,wordIndex+1)))
+            {
+                wordLetters[wordIndex] = word[random].substring(wordIndex, wordIndex+1); 
+                letterAppears=true;
+            }
+            wordIndex++;
+        }
+        wordIndex = 0;
+        
+        for (int i = 0; i < word[random].length(); i++)
+            guessField = guessField + wordLetters[i] + " ";
+        
+        if (!(letterAppears==false)) //the input letter does appear
+        {
+            history = BASIC_HANGMAN_MESSAGE 
+                    + "Nice guess!" + "\n"
+                    + "Letters used: " + usedField + "\n"
+                    + "Chances left: " + chancesLeft + "\n"
+                    + guessField;
+            setText(history);  
+        }
+        else //input does not appear
+        {
+            chancesLeft --;
+            if (chancesLeft > 0)
+            {
+                history = BASIC_HANGMAN_MESSAGE 
+                        + "Oops!" + "\n"
+                        + "Letters used: " + usedField + "\n"
+                        + "Chances left: " + chancesLeft + "\n"
+                        + guessField;
+            }
+            else 
+            {
+                history = BASIC_HANGMAN_MESSAGE 
+                        + "GAME OVER! You ran out of chances" + "\n"
+                        + "Letters used: " + usedField + "\n"
+                        + "Chances left: " + chancesLeft + "\n"
+                        + guessField + "\n"
+                        + "Press Enter to play again";
+                setText(history);  
+                
+                getGuess(); //to pause the game
+                resetHangman();  
+            }
+            setText(history);  
+        }
+    }
+    /** checkString compares the user input string
+     * to the word and replaces the whole guessField
+     * with the letters of the word if they match.
+     * It also runs resetHangman to get a new word 
+     * for the next time the guessWord runs
+     * @param none
+     * @return none
+     */
+    private void checkString()
+    {
+        if (userInput.equals(word[random]))
+        {
+            for (int i = 0; i < word[random].length(); i++)
+                guessField = guessField + word[random].substring(i,i+1) + " ";
+            
+            history = BASIC_HANGMAN_MESSAGE 
+                    + "YAY Correct Word!" + "\n"
+                    + "Letters used: " + usedField + "\n"
+                    + "Chances left: " + chancesLeft + "\n"
+                    + guessField + "\n"
+                    + "Press Enter to play again";
+            setText(history);  
+            
+            getGuess(); //to pause the game
+            resetHangman();
+            setText(history);  
+        }
+        else
+        {
+            chancesLeft = chancesLeft - 2;
+            
+            for (int i = 0; i < word[random].length(); i++)
+                guessField = guessField + wordLetters[i] + " ";
+            
+            if (chancesLeft > 0)
+            {                
+                history = BASIC_HANGMAN_MESSAGE 
+                        + "That's not the Word!" + "\n"
+                        + "Letters used: " + usedField + "\n"
+                        + "Chances left: " + chancesLeft + "\n"
+                        + guessField;
+            }
+            else 
+            {
+                history = BASIC_HANGMAN_MESSAGE 
+                        + "GAME OVER! You ran out of chances" + "\n"
+                        + "Letters used: " + usedField + "\n"
+                        + "Chances left: " + chancesLeft + "\n"
+                        + guessField + "\n"
+                        + "Press Enter to play again";
+                setText(history);  
+                
+                getGuess(); //to pause the game
+                resetHangman();  
+            }
+            setText(history);  
+        }
+    }
+    private void updateUsedLetters()
+    {
+        usedField = "";
+        
+        while (wordIndex < ALPHABET.length())
+        {
+            if (userInput.equals(ALPHABET.substring(wordIndex,wordIndex+1)))
+                usedLetters[wordIndex] = ALPHABET.substring(wordIndex,wordIndex+1) + ", ";
+            wordIndex++;
+        }
+        wordIndex = 0;
+        
+        for (int i = 0; i < ALPHABET.length(); i++)
+            usedField = usedField + usedLetters[i];
+    }
+}

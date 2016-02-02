@@ -1,0 +1,84 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: perimeter
+*/
+public class perimeter
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out, true);
+        
+//        BufferedReader f = new BufferedReader(new FileReader("perimeter.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("perimeter.out")));
+        
+        perimeter p = new perimeter();
+        
+        Space[][] field = new Space[100][100];
+        for (int x=0; x<100; x++)
+            for (int y=0; y<100; y++)
+                field[x][y] = p.newSpace(Space.EMPTY);
+        
+        int n = Integer.parseInt(f.readLine());
+        for (int i=0; i<n; i++)
+        {
+            StringTokenizer st = new StringTokenizer(f.readLine());
+            field[Integer.parseInt(st.nextToken())-1][100-Integer.parseInt(st.nextToken())].type = Space.HAY;
+        }
+        
+        for (int x=0; x<100; x++)
+            for (int y=0; y<100; y++)
+            {
+                if (field[x][y].type==Space.HAY)
+                {
+                    if (x==0) 
+                        field[x][y].west = true;
+                    if (x==99)
+                        field[x][y].east = true;
+                    if (y==0)
+                        field[x][y].south = true;
+                    if (y==99)
+                        field[x][y].north = true;
+                }
+                else
+                    field[x][y].hole = field[x][y].isHole(field, x, y);
+            }
+    }
+    
+    public Space newSpace(int type)
+    {
+        return new Space(type);
+    }
+    
+    class Space
+    {
+        public static final int HAY = 0;
+        public static final int EMPTY = 1;
+        
+        int type;
+        boolean north;
+        boolean east;
+        boolean south;
+        boolean west;
+        boolean hole;
+        
+        Space(int aType)
+        {
+            type = aType;
+            north = false;
+            east = false;
+            south = false;
+            west = false;
+            hole = false;
+        }
+        
+        public boolean isHole(Space[][] field, int x, int y)
+        {
+            
+        }
+    }
+}

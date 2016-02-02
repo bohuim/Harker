@@ -1,0 +1,52 @@
+
+/**
+ * 
+ * @author Dennis Moon
+ * @version Mar 9, 2013
+ * 
+ * @Revision:
+ *     Mar 9, 2013 - class created
+ */
+public class Move
+{
+    public static final int STOCK = 0;
+    public static final int WASTE = 1;
+    
+    private int target;
+    private int destination;
+    private int num;
+    private boolean flipped;
+    
+    public Move(int t, int d, int n, boolean f)
+    {
+        target = t;
+        destination = d;
+        num = n;
+        flipped = f;
+    }
+    
+    public int getTarget()
+    {
+        return target;
+    }
+    
+    public int getDestination()
+    {
+        return destination;
+    }
+    
+    public int getNumber()
+    {
+        return num;
+    }
+    
+    public static int convertPile(int index)
+    {
+        return index+2;
+    }
+    
+    public static int convertFoudation(int index)
+    {
+        return index+9;
+    }
+}

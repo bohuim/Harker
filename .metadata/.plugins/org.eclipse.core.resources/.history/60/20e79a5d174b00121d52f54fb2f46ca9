@@ -1,0 +1,62 @@
+import java.awt.Color;
+
+/**
+ * Paddle is a contrable sideways moving obstacle
+ * but handles collisions in a more complex way
+ * 
+ * @author Dennis Moon
+ */
+public class Paddle extends Obstacle
+{
+    
+    /**
+     * Constructor: Paddle()
+     * Usage: Paddle paddle = new Paddle()
+     * ---------------------------
+     * Paddles are set to Blue with width 10 & heigth 2
+     * starts at (40,90)
+     */
+    public Paddle()
+    {
+        super(Color.BLUE, 40,90, 10,2);
+    }
+    
+    /**
+     * Method: moveLeft()
+     * Usage: called to move paddle to the left
+     * --------------------------
+     * sets X-pos as previous - 2
+     * but prevents going off screen
+     */
+    public void moveLeft()
+    {
+        if (!(getX()<=0))
+            setX(getX()-2);
+    }
+    
+    /**
+     * Method: moveRight()
+     * Usage: called to move paddle to the right
+     * --------------------------
+     * sets X-pos as previous + 2
+     * but prevents going off screen
+     */
+    public void moveRight()
+    {
+        if (!(getX()>=89))
+            setX(getX()+2);
+    }
+    
+    public boolean handleCollision(Ball ball)
+    {
+        super.handleCollision(ball);
+        
+        double relX = (ball.getX()-getX())/getWidth()*2 -1;
+        double angle = Math.atan2(ball.getVelocityY(), ball.getVelocityX());
+        angle += relX*Math.PI/4;
+        
+        ball.setVelocityX(Math.cos(angle));
+        ball.setVelocityY(Math.sin(angle));
+        return false;
+    }
+}

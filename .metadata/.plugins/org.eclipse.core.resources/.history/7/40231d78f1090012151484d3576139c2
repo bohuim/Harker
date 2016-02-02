@@ -1,0 +1,939 @@
+/**
+ * Class Game - the main class of the "Hark" game.
+ * 120915
+ * @version 070111
+ *          Moved the main method into its own class
+ * @version 061412
+ *			Cleaned up comments
+ * @version 120914
+ *          modified and updated to part 1: can take items
+ * @version 1209120
+ *          hero can now equip weapons&armor, attack&check status of people, use consumable items
+ *@version 1209128
+ *          the world added, monsters placed, items created
+ *          hero can see his bag, his location
+ *          
+ *  Michael Kolling's Zork code, modified to resemble MIT's 6.001 Adventure Game.
+ *
+ *  This class is the main class of the "Hark" application. Hark is a very
+ *  simple, text based adventure game.  Users can walk around some scenery.
+ *  That's all. It should really be extended to make it more interesting!
+ *
+ *  To play this game, create an instance of this class and call the "play"
+ *  routine.
+ *
+ *  This main class creates and initializes all the others: it creates all
+ *  rooms, creates the parser and starts the game.  It also evaluates the
+ *  commands that the parser returns.
+ *  
+ *  @author Michael Kolling
+ *  @edited Part 1 - Andrew Luo, Dennis Moon
+ */
+
+import java.util.ArrayList;
+
+public class Game
+{
+    private static Parser parser;
+    private Person hero;
+    private ArrayList<Person> otherPeople;
+    private ArrayList<Room> rooms;
+    private ArrayList<Thing> items;
+    
+    private String heroName;
+
+    /**
+     * Create the game and initialize its internal map.
+     */
+    public Game()
+    {
+        parser = new Parser();
+        
+        //initial setup
+        printWelcome();
+        Command answer = parser.getCommand();
+        heroName = answer.getCommandWord(1);
+        
+        setup();
+    }
+
+    /**
+     * Create all the rooms, link their exits together, and populate them.
+     */
+    private void setup()
+    {   
+        //rooms
+        Room tutorialRoom, town, westField, eastField, northField, towerEntrance, prepStage, grendelsLair, secretChamber;
+        Room floor1, floor2, floor3, floor4, floor5, floor6;
+        
+        tutorialRoom = new Room("Mysterious Forest");
+        town = new Room("Town");
+        westField = new Room("West Field");
+        eastField = new Room("East Field");
+        northField = new Room("North Field");
+        towerEntrance = new Room("Tower Entrance");
+        floor1 = new Room("Andy's Room");
+        floor2 = new Room("Kenny's Chamber");
+        floor3 = new Room("Daniel's Nest");
+        floor4 = new Room("Brandon's Den");
+        floor5 = new Room("William's Stage");
+        floor6 = new Room("Shreyas's Arena");
+        prepStage = new Room("Grendels Doors");
+        grendelsLair = new Room("Grendels Lair");
+        secretChamber = new Room("Chamber of Gods");
+        
+        tutorialRoom.setExits(town, null, null, null);
+        town.setExits(northField, eastField, tutorialRoom, westField);
+        westField.setExits(null, town, null, null);
+        eastField.setExits(null, null, null, town);
+        northField.setExits(towerEntrance, null, town, null);
+        towerEntrance.setExits(null, floor1, northField, null);
+        floor1.setExits(floor2, null, null, towerEntrance);
+        floor2.setExits(floor3, null, floor1, null);
+        floor3.setExits(floor4, null, floor2, null);
+        floor4.setExits(floor5, null, floor3, null);
+        floor5.setExits(floor6, null, floor3, null);
+        floor6.setExits(prepStage, null, floor5, null);
+        prepStage.setExits(grendelsLair, null, floor5, null);
+        grendelsLair.setExits(null, null, null, null);
+        secretChamber.setExits(null, null, null, null);
+        
+        rooms = new ArrayList<Room>();
+        rooms.add(tutorialRoom);
+        rooms.add(town);
+        rooms.add(westField);
+        rooms.add(eastField);
+        rooms.add(northField);
+        rooms.add(towerEntrance);
+        rooms.add(floor1);
+        rooms.add(floor2);
+        rooms.add(floor3);
+        rooms.add(floor4);
+        rooms.add(floor5);
+        rooms.add(floor6);
+        rooms.add(prepStage);
+        rooms.add(grendelsLair);
+        rooms.add(secretChamber);
+        
+        
+        //people 
+        hero = new Person(heroName, Person.HERO, 1);
+        hero.changeRoom(tutorialRoom);
+        
+        Person scarecrow = new Person("ScareCrow", Person.ROBOT, 1);
+        scarecrow.changeRoom(tutorialRoom);
+        
+        Person slime = new Person("Slime", Person.SLIME, 5);
+        slime.changeRoom(eastField);
+        Person slime2 = new Person("Slime2", Person.SLIME, 3);
+        slime2.changeRoom(eastField);
+        Person slime3 = new Person("Slime3", Person.SLIME, 4);
+        slime3.changeRoom(eastField);
+        
+        Person woodElf = new Person("Wood Elf", Person.ELF, 4);
+        woodElf.changeRoom(westField);
+        Person woodElf2 = new Person("Wood Elf2", Person.ELF, 4);
+        woodElf2.changeRoom(westField);
+        Person woodElf3 = new Person("Wood Elf3", Person.ELF, 5);
+        woodElf3.changeRoom(westField);
+        
+        Person bandit = new Person("Bandit", Person.KNIGHT, 8);
+        bandit.changeRoom(northField);
+        Person bandit2 = new Person("Bandit2", Person.KNIGHT, 7);
+        bandit2.changeRoom(northField);
+        Person bandit3 = new Person("Bandit3", Person.KNIGHT, 8);
+        bandit3.changeRoom(northField);
+        
+        Person gateKeeper = new Person("Gate Keeper", Person.GHOST, 10);
+        gateKeeper.changeRoom(towerEntrance);
+        Person gateKeeper2 = new Person("Gate Keeper2", Person.GHOST, 10);
+        gateKeeper2.changeRoom(towerEntrance);
+        
+        Person magician = new Person("Magician", Person.MAGICIAN, 13);
+        magician.changeRoom(floor1);
+        Person magician2 = new Person("Magician2", Person.MAGICIAN, 12);
+        magician2.changeRoom(floor1);
+        Person magician3 = new Person("Magician3", Person.MAGICIAN, 12);
+        magician3.changeRoom(floor1);
+        
+        Person toySoldier = new Person("Toy Soldier", Person.SOLDIER, 16);
+        toySoldier.changeRoom(floor2);
+        Person toySoldier2 = new Person("Toy Soldier2", Person.SOLDIER, 18);
+        toySoldier2.changeRoom(floor2);
+        Person toySoldier3 = new Person("Toy Soldier3", Person.SOLDIER, 17);
+        toySoldier3.changeRoom(floor2);
+        
+        Person golem = new Person("Rock golem", Person.GOLEM, 21);
+        golem.changeRoom(floor3);
+        Person golem2 = new Person("Rock golem2", Person.GOLEM, 22);
+        golem2.changeRoom(floor3);
+        Person golem3 = new Person("Rock golem3", Person.GOLEM, 22);
+        golem3.changeRoom(floor3);
+        
+        Person knight = new Person("Knight", Person.KNIGHT, 23);
+        knight.changeRoom(floor4);
+        Person knight2 = new Person("Knight2", Person.KNIGHT, 24);
+        knight2.changeRoom(floor4);
+        Person knight3 = new Person("Knight3", Person.KNIGHT, 25);
+        knight3.changeRoom(floor4);
+        
+        Person werewolf = new Person("Werewolf", Person.MONSTER, 27);
+        werewolf.changeRoom(floor5);
+        Person werewolf2 = new Person("Werewolf2", Person.MONSTER, 26);
+        werewolf2.changeRoom(floor5);
+        Person werewolf3 = new Person("Werewolf3", Person.MONSTER, 27);
+        werewolf3.changeRoom(floor5);
+        
+        Person vampire = new Person("Vampire", Person.MAGICIAN, 31);
+        vampire.changeRoom(floor6);
+        Person vampire2 = new Person("Vampire2", Person.MAGICIAN, 32);
+        vampire2.changeRoom(floor6);
+        Person vampire3 = new Person("Vampire3", Person.MAGICIAN, 32);
+        vampire3.changeRoom(floor6);
+        
+        Person lightGuardian = new Person("Light Guardian", Person.KNIGHT, 36);
+        lightGuardian.changeRoom(prepStage);
+        Person shadowGuardian = new Person("Shadow Guardian", Person.KNIGHT, 36);
+        shadowGuardian.changeRoom(prepStage);
+        
+        Person grendel = new Person("Grendel", Person.BOSS, 50);
+        grendel.changeRoom(grendelsLair);
+        
+        
+        otherPeople = new ArrayList<Person>();
+        otherPeople.add(scarecrow);
+        otherPeople.add(slime);
+        otherPeople.add(slime2);
+        otherPeople.add(slime3);
+        otherPeople.add(woodElf);
+        otherPeople.add(woodElf2);
+        otherPeople.add(woodElf3);
+        otherPeople.add(bandit);
+        otherPeople.add(bandit2);
+        otherPeople.add(bandit3);
+        otherPeople.add(gateKeeper);
+        otherPeople.add(gateKeeper2);
+        otherPeople.add(magician);
+        otherPeople.add(magician2);
+        otherPeople.add(toySoldier);
+        otherPeople.add(toySoldier2);
+        otherPeople.add(toySoldier3);
+        otherPeople.add(golem);
+        otherPeople.add(golem2);
+        otherPeople.add(golem3);
+        otherPeople.add(knight);
+        otherPeople.add(knight2);
+        otherPeople.add(knight3);
+        otherPeople.add(werewolf);
+        otherPeople.add(werewolf2);
+        otherPeople.add(werewolf3);
+        otherPeople.add(vampire);
+        otherPeople.add(vampire);
+        otherPeople.add(vampire2);
+        otherPeople.add(vampire3);
+        otherPeople.add(lightGuardian);
+        otherPeople.add(shadowGuardian);
+        otherPeople.add(grendel);
+        
+        //consumes
+        Consume[] scrolls = new Consume[5];
+        for (int i=0; i<scrolls.length; i++)
+        {
+            scrolls[i] = new Consume("scroll", Consume.SCROLL, 0);
+            Room randomRoom = getRandomRoom();
+            if (randomRoom.getPeople().size()!=0)
+                scrolls[i].changeOwner(randomRoom.getRandomPerson());
+            else
+                scrolls[i].changeOwner(getRandomRoom());
+        }
+        scrolls[0].changeOwner(hero);
+        scrolls[1].changeOwner(secretChamber);
+        
+        Consume[] smallPotions = new Consume[7];
+        for (int i=0; i<smallPotions.length; i++)
+            smallPotions[i] = new Consume("small potion", Consume.POTION, 20);
+        smallPotions[0].changeOwner(hero);
+        smallPotions[1].changeOwner(hero);
+        smallPotions[2].changeOwner(town);
+        smallPotions[2].changeOwner(slime);
+        smallPotions[4].changeOwner(woodElf);
+        smallPotions[5].changeOwner(bandit);
+        smallPotions[6].changeOwner(bandit2);
+        
+        Consume[] mediumPotions = new Consume[6];
+        for (int i=0; i<mediumPotions.length; i++)
+            mediumPotions[i] = new Consume("medium potion", Consume.POTION, 50);
+        mediumPotions[0].changeOwner(towerEntrance);
+        mediumPotions[1].changeOwner(gateKeeper);
+        mediumPotions[2].changeOwner(magician);
+        mediumPotions[3].changeOwner(toySoldier);
+        mediumPotions[4].changeOwner(toySoldier2);
+        mediumPotions[5].changeOwner(floor4);
+        
+        Consume[] largePotions = new Consume[4];
+        for (int i=0; i<largePotions.length; i++)
+            largePotions[i] = new Consume("large potion", Consume.POTION, 80);
+        largePotions[0].changeOwner(golem3);
+        largePotions[1].changeOwner(knight);
+        largePotions[2].changeOwner(werewolf);
+        largePotions[3].changeOwner(werewolf2);
+        
+        Consume[] maxPotions = new Consume[4];
+        for (int i=0; i<maxPotions.length; i++)
+            maxPotions[i] = new Consume("max potion", Consume.POTION, 120);
+        maxPotions[0].changeOwner(vampire3);
+        maxPotions[1].changeOwner(lightGuardian);
+        maxPotions[2].changeOwner(shadowGuardian);
+        maxPotions[3].changeOwner(grendelsLair);
+        
+        //equips
+        Equip knife = new Equip("small knife", Equip.WEAPON, 25);
+        knife.changeOwner(hero);
+        knife.equipTo(hero);
+        Equip plainClothes = new Equip("plain clothes", Equip.ARMOR, 5);
+        plainClothes.changeOwner(hero);
+        plainClothes.equipTo(hero);
+        
+        Equip dullSword = new Equip("dull sword", Equip.WEAPON, 45);
+        dullSword.changeOwner(slime3);
+        Equip leatherArmor = new Equip("leather armor", Equip.ARMOR, 18);
+        leatherArmor.changeOwner(woodElf2);
+        
+        Equip katana = new Equip("katana", Equip.WEAPON, 66);
+        katana.changeOwner(gateKeeper);
+        Equip woodShield = new Equip("wood shield", Equip.ARMOR, 42);
+        woodShield.changeOwner(gateKeeper2);
+        
+        Equip shiningSword = new Equip("shining sword", Equip.WEAPON, 125);
+        shiningSword.changeOwner(knight2);
+        Equip chainMail = new Equip("chain mail", Equip.ARMOR, 82);
+        chainMail.changeOwner(knight3);
+        
+        Equip cursedBlade = new Equip("cursed blade", Equip.WEAPON, 240);
+        cursedBlade.changeOwner(vampire);
+        Equip cursedRobe = new Equip("cursed robe", Equip.ARMOR, 160);
+        cursedRobe.changeOwner(werewolf2);
+        
+        Equip excalibur = new Equip("excalibur", Equip.WEAPON, 450);
+        excalibur.changeOwner(lightGuardian);
+        Equip plasmaShield = new Equip("plasma shield", Equip.ARMOR, 320);
+        plasmaShield.changeOwner(shadowGuardian);
+        
+        Equip zeusLightning = new Equip("Lightning of Zeus", Equip.WEAPON, 600);
+        zeusLightning.changeOwner(secretChamber);
+        Equip heliosShield = new Equip("Shield of Helios", Equip.ARMOR, 500);
+        heliosShield.changeOwner(secretChamber);
+        
+        items = new ArrayList<Thing>();
+        for (Consume c : scrolls)
+            items.add(c);
+        for (Consume c : smallPotions)
+            items.add(c);
+        for (Consume c : mediumPotions)
+            items.add(c);
+        for (Consume c : largePotions)
+            items.add(c);
+        for (Consume c : maxPotions)
+            items.add(c);
+        items.add(knife);
+        items.add(plainClothes);
+        items.add(dullSword);
+        items.add(leatherArmor);
+        items.add(katana);
+        items.add(woodShield);
+        items.add(shiningSword);
+        items.add(chainMail);
+        items.add(cursedBlade);
+        items.add(cursedRobe);
+        items.add(excalibur);
+        items.add(plasmaShield);
+        items.add(zeusLightning);       
+        items.add(heliosShield);
+    }
+    
+    /**
+     *  Main play routine.  Loops until end of play.
+     */
+    public void play()
+    {   
+        System.out.println();
+        System.out.println(hero.getRoom().longDescription());
+        System.out.println();
+        hero.getStatus();
+        System.out.println();
+        
+        // Enter the main command loop.  Here we repeatedly read commands and
+        // execute them until the game is over.
+
+        boolean finished = false;
+        while (! finished)
+        {
+            Command command = parser.getCommand();
+            finished = processCommand(command);
+            System.out.println();
+        }
+        System.out.println("Thank you for playing.  Good bye.");
+    }
+
+    /**
+     * Print out the opening message for the player.
+     */
+    private void printWelcome()
+    {
+        System.out.println();
+        System.out.println("Welcome to Hark!");
+        System.out.println("Hark is a new, incredibly boring adventure game.");
+        System.out.println("Your first name is...");
+    }
+
+    /**
+     * Given a command, process (that is: execute) the command.
+     * If this command ends the game, true is returned, otherwise false is
+     * returned.
+     */
+    private boolean processCommand(Command command)
+    {
+        if(command.isUnknown())
+        {
+            System.out.println("I don't know what you mean...");
+            return false;
+        }
+
+        String commandWord = command.getCommandWord(1);
+        if (commandWord.equals("help"))
+            printHelp();
+        else if (commandWord.equals("go"))
+            goRoom(command);
+        else if (commandWord.equals("take"))
+        {
+            takeThing(command);
+            attackHero();
+        }
+        else if (commandWord.equals("equip"))
+        {
+            equipThing(command);
+            attackHero();
+        }
+        else if (commandWord.equals("attack"))
+            attackPerson(command);
+        else if (commandWord.equals("status"))
+            statusOf(command);
+        else if (commandWord.equals("use"))
+            useItem(command);
+        else if (commandWord.equals("rest"))
+            rest();
+        else if (commandWord.equals("drop"))
+            dropItem(command);
+        else if (commandWord.equals("bag"))
+            seeInventory();
+        else if (commandWord.equals("location"))
+            seeLocation();
+        else if (commandWord.equals("quit"))
+        {
+            if(command.hasWord(2))
+                System.out.println("Quit what?");
+            else
+                return true;  // signal that we want to quit
+        }
+        if (hero.getHealth()<=0)
+        {
+            setup();
+            hero.reviveHero(findRoom("town"));
+        }
+        return false;
+    }
+    
+    public static boolean askBoolean()
+    {
+        boolean answer = false;
+        
+        Command command = parser.getCommand();
+        String response = command.getCommandWord(1);
+        if (response.toLowerCase().equals("yes"))
+            answer = true;
+        
+        return answer;
+    }
+
+    // implementations of user commands:
+
+    /**
+     * Print out some help information.
+     * Here we print some stupid, cryptic message and a list of the
+     * command words.
+     */
+    private void printHelp()
+    {
+        System.out.println("Your command words are:");
+        System.out.println(CommandWords.showAll());
+        System.out.println();
+    }
+
+    /**
+     * Try to go to one direction. If there is an exit, enter the new
+     * room and make all other people act, otherwise print an error message.
+     */
+    private void goRoom(Command command)
+    {
+        if(!command.hasWord(2))
+        {
+            // if there is no second word, we don't know where to go...
+            System.out.println("Go where?");
+        }
+        else
+        {
+            boolean enter = true;
+            String direction = command.getCommandWord(2);
+    
+            // Try to leave current room.
+            Room nextRoom = hero.getRoom().nextRoom(direction);
+      
+            if (nextRoom == null)
+                System.out.println("There is no door!");
+            else
+            {
+                //prompts user if they wish to enter the boss fight
+                if (nextRoom.getName().equals("Grendels Lair"))
+                {
+                    System.out.println("You are about to enter a boss fight. There are no exits once you enter. Enter?");
+                    enter = askBoolean();
+                }
+                if (enter)
+                {
+                    hero.changeRoom(nextRoom);
+                    //moveOtherPeople();
+                    System.out.println(nextRoom.longDescription());
+                }
+                else
+                    System.out.println("You did not enter the boss fight");
+            }
+        }
+    }
+
+    //returns a random room in the game
+    private Room getRandomRoom()
+    {
+        int index = Game.random(rooms.size());
+        Room room = rooms.get(index);
+        return room;
+    }
+
+    //cause other people to act (which typically means moving)
+    private void moveOtherPeople()
+    {
+        for (int i = 0; i < otherPeople.size(); i++)
+        {
+            Person person = otherPeople.get(i);
+            person.act(hero);
+        }
+    }
+
+    //returns a random integer from 0 to n-1
+    public static int random(int n)
+    {
+        return (int)(Math.random() * n);
+    }
+    
+    /**
+     * takeThing takes in a command and causes the hero take something from the room
+     * 
+     * @param command - name of the item being taken from the source
+     */
+    private void takeThing(Command command)
+    {
+        if(!command.hasWord(2))
+            System.out.println("take what?");
+        else
+        {
+            String itemName = command.getCommandWord(2);
+            if (command.hasWord(3))
+                itemName += " " + command.getCommandWord(3);
+            if (command.hasWord(4))
+                itemName += " " + command.getCommandWord(4);
+            
+            hero.take(hero.getRoom().getThing(itemName));
+        }
+    }
+    
+    /**
+     * equips hero with given item
+     * 
+     * @param h - name of weapon/armor
+     */
+    private void equipThing(Command command)
+    {
+        Equip item = null;
+        
+        if (!command.hasWord(2))
+            System.out.println("equip what?");
+        else
+        {
+            String itemName = command.getCommandWord(2);
+            if (command.hasWord(3))
+                itemName += " " + command.getCommandWord(3);
+            if (command.hasWord(4))
+                itemName += " " + command.getCommandWord(4);
+            
+            item = findEquip(itemName);
+        }
+        
+        if (item!=null)
+        {
+            item.equipTo(hero);
+            hero.say("I have equipped " + item.getName());
+            if (item.getType()==Equip.WEAPON)
+                hero.say("My attack is now " + hero.getAtk());
+            else
+                hero.say("My defense is now " + hero.getDef());
+        }
+        else
+            System.out.println("You don't even have that item!");
+    }
+    
+    /**
+     * hero attacks designated person & the victim attacks back with 50% chance if the victim did not die
+     * 
+     * @param command - name of person being attacked
+     */
+    private void attackPerson(Command command)
+    {
+        Person victim = null;
+        
+        if (!command.hasWord(2))
+            System.out.println("attack who?");
+        else
+        {
+            String personName = command.getCommandWord(2);
+            if (command.hasWord(3))
+                personName += " " + command.getCommandWord(3);
+            if (command.hasWord(4))
+                personName += " " + command.getCommandWord(4);
+            
+            victim = findPerson(personName);
+        }
+        
+        if (victim != null)
+        {
+            hero.attack(victim);
+            if (victim.getHealth()>0 && Game.random(2)==0 && !victim.getName().equals("Scarecrow"))
+                victim.attack(hero);
+        }
+        else
+            System.out.println("That person isn't even in this room!");
+    }
+    
+    /**
+     * statusOf finds the correct person and calls person.getStatus
+     * 
+     * @param command - the command user feeds into console after the "status of" command
+     */
+    private void statusOf(Command command)
+    {
+        Person aPerson = hero;
+        
+        if (!command.hasWord(2))
+            aPerson.getStatus();
+        else
+        {
+            String personName = command.getCommandWord(2);
+            if (command.hasWord(3))
+                personName += " " + command.getCommandWord(3);
+            if (command.hasWord(4))
+                personName += " " + command.getCommandWord(4);
+            
+            aPerson = findPerson(personName);
+            
+            if (aPerson!=null)
+                aPerson.getStatus();
+            else
+                System.out.println("That person isn't even in the room");
+        }
+    }
+    
+    /**
+     * rest calls hero's restoreHealth if hero is in the town
+     */
+    private void rest()
+    {
+        if(hero.getRoom().getName().toLowerCase().equals("town"))
+            hero.restoreHealth();
+        else
+            System.out.println("You can't rest here!");
+    }
+    
+    /**
+     * hero uses designated item and get its effect accordingly
+     * 
+     * @param command - name of item being used
+     */
+    private void useItem(Command command)
+    {
+        Consume item = null;
+        
+        if (!command.hasWord(2))
+            System.out.println("Use what?");
+        else
+        {
+            String itemName = command.getCommandWord(2);
+            if (command.hasWord(3))
+                itemName += " " + command.getCommandWord(3);
+            if (command.hasWord(4))
+                itemName += " " + command.getCommandWord(4);
+            
+            item = findConsume(itemName);
+        }
+        
+        if (item!=null && item.getType()==Consume.POTION)
+        {
+            hero.use(item);
+            attackHero();
+        }
+        else if (item!=null && item.getType()==Consume.SCROLL)
+        {
+            if (hero.getRoom().getName().equals("Grendels Lair"))
+                System.out.println("You can't use that here!");
+            else
+            {
+                System.out.print("teleport to: ");
+                teleportHero();
+            }
+        }
+        else 
+            System.out.println("You don't even have that item!");
+    }
+    
+    /**
+     * helps the useItems method if hero wants to use teleport scroll
+     * by finding the entered room and displaying error messages if there are any errors
+     * 
+     * @param command - command of the hero
+     */
+    private void teleportHero()
+    {
+        boolean executed = false;
+        while (!executed)
+        {
+            Command command = parser.getCommand();
+            String roomName = command.getCommandWord(1);
+            if (command.hasWord(2))
+                roomName += " " + command.getCommandWord(2);
+            if (command.hasWord(3))
+                roomName += " " + command.getCommandWord(3);
+            
+            Room target = findRoom(roomName);
+           
+            if (target!=null)
+            {
+                //cannot teleport to the boss room
+                if (target.getName().equals("Grendels Lair"))
+                {
+                    System.out.println("You can't teleport there!");
+                    System.out.print("Please enter another room: ");
+                }
+                else 
+                {
+                    hero.teleport(target);
+                    executed = true;
+                }
+            }
+            else 
+            {
+                System.out.println("That room doesn't even exist!");
+                System.out.print("Please enter another room: ");
+            }
+        } 
+    }
+    
+    /**
+     * Drops the named item to the room hero is currently in
+     * 
+     * @param command - command of the hero
+     */
+    private void dropItem(Command command)
+    {
+        Thing item = null;
+        
+        if (!command.hasWord(2))
+            System.out.println("drop what?");
+        else 
+        {
+            String itemName = command.getCommandWord(2);
+            if (command.hasWord(3))
+                itemName += command.getCommandWord(3);
+            if (command.hasWord(4))
+                itemName += command.getCommandWord(4);
+            
+            item = findThing(itemName);
+            
+            if (item!=null)
+            {
+                hero.say("I dropped " + item.getName() + " into " + hero.getRoom().getName());
+                item.changeOwner(hero.getRoom());
+            }
+            else
+                System.out.println("You don't even have that item in your bag!");
+        }
+    }
+    
+    /**
+     * returns list of things hero is carrying
+     */
+    private void seeInventory()
+    {
+        String bagList = "Items (Hero): ";
+        
+        bagList += makeQuantityList(hero.getThings());
+        
+        System.out.println(bagList);
+    }
+    
+    /**
+     * returns description of hero's location
+     */
+    private void seeLocation()
+    {
+        System.out.println(hero.getRoom().longDescription());
+    }
+    
+    /**
+     * Executed every time hero uses, takes, or equips
+     * every monster in the room attacks the hero with 1/3 chance
+     */
+    private void attackHero()
+    {
+        for (Person p : hero.getRoom().getPeople())
+        {
+            if (random(3)==0 &&!p.equals(hero))
+                p.attack(hero);
+        }
+    }
+    
+    /**
+     * findPerson returns the person with the given name, or null if that person doesn't exist
+     * 
+     * @param name - name of the person
+     * @return target - returns person wit the name
+     */
+    private Person findPerson(String name)
+    {
+        Person target = null;
+        for (Person p : hero.getRoom().getPeople())
+        {
+            if (name.toLowerCase().equals(p.getName().toLowerCase()))
+                target = p;
+        }
+        return target;
+    }
+    
+    /**
+     * findThing returns the thing with the given name from hero's inventory, or null if that item doesnt exist
+     * 
+     * @param name - name of thing
+     * @return target - returns the found thing
+     */
+    private Thing findThing(String name)
+    {
+        Thing target = null;
+        for (Thing t: hero.getThings())
+        {
+            if (name.toLowerCase().equals(t.getName().toLowerCase()))
+                 target = t;
+        }
+        return target;
+    }
+    
+    /**
+     * findEquip returns the equip item with the given name, or null if that equip doesn't exist
+     * 
+     * @param name - name of the equip item
+     * @return target - returns equip item with the name
+     */
+    private Equip findEquip(String name)
+    {
+        Equip target = null;
+        for (Thing t: hero.getThings())
+        {
+            if (name.toLowerCase().equals(t.getName().toLowerCase()))
+                 target = (Equip) t;
+        }
+        return target;
+    }
+    
+    /**
+     * findConsume returns the consume item with the given name, or null if that person doesn't exist
+     * 
+     * @param name - name of the consume item
+     * @return target - returns consume item with the name
+     */
+    private Consume findConsume(String name)
+    {
+        Consume target = null;
+        for (Thing t : hero.getThings())
+        {
+            if (name.toLowerCase().equals(t.getName().toLowerCase()))
+                target = (Consume) t;
+        }
+        return target;
+    }
+    
+    /**
+     * findRoom returns the room with the given name, or null if that person doesn't exist
+     * 
+     * @param name - name of the room
+     * @return target - returns the room with the name
+     */
+    private Room findRoom(String name)
+    {
+        Room target = null;
+        for (Room r : rooms)
+        {
+            if (name.toLowerCase().equals(r.getName().toLowerCase()))
+                target = (Room) r;
+        }
+        return target;
+    }
+    
+    /**
+     * makeQuantityList takes in a arraylist of things, copies the names of the elements in new arraylist
+     * starting from index 0, it compares all other elements starting from the back to the index being compared +1
+     * if two items match, the one further back is deleted, and one in front is replaced by itemName(quantity)
+     * but leaves just the itemName if there is only one
+     * after going through and attaching quantities to all the items, its copied into a string and returned
+     * 
+     * @param things - arraylist of things that is going to be filtered
+     * @return list - string list of items with the quantity next it the name
+     */
+    public static String makeQuantityList (ArrayList<Thing> things)
+    {
+        String list = "";
+        
+        ArrayList<String> copy = new ArrayList<String>();
+        for (Thing t:things)
+            copy.add(t.getName());
+        
+        for (int i=0; i<copy.size(); i++)
+        {
+            int count = 1;
+            for (int n=copy.size()-1; n>i; n--)
+            {
+                if (copy.get(i).equals(copy.get(n)) && count==1)
+                {
+                    count++;
+                    copy.remove(n);
+                    copy.add(i, copy.get(i)+"(" + count + ")");
+                    copy.remove(i+1);
+                }
+                else if (copy.get(i).equals(copy.get(n)))
+                {
+                    count++;
+                    copy.remove(n);
+                }
+            }
+        }
+        
+        for (String s:copy)
+            list += s + ", ";
+        
+        return list;
+    }
+}

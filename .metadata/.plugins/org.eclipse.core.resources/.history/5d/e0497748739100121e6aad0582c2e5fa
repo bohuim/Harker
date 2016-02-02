@@ -1,0 +1,343 @@
+import java.io.*;
+import java.util.*;
+
+/**
+ * 
+ * 
+ * @author Dennis Moon
+ * @version Mar 19, 2013
+ * 
+ * @Revision:
+ *     Mar 18, 2013 - class created & 
+ *     Mar 19, 2013 - 
+ */
+public class TreeUtil
+{
+	//used to prompt for command line input
+	private static Scanner in = new Scanner(System.in);
+
+	//precondition:  t is non-empty
+	//postcondition: returns the VALUE in the leftmost node of t.
+	public static Object leftmost(TreeNode t)
+	{
+	    TreeNode left = t;
+		while (left.getLeft() != null)
+		    left = left.getLeft();
+		return left.getValue();
+	}
+
+	//precondition:  t is non-empty
+	//postcondition: returns the VALUE in the rightmost node of t.
+	public static Object rightmost(TreeNode t)
+	{
+		if (t.getRight() == null)
+		    return t.getValue();
+		return rightmost(t.getRight());
+	}
+
+	//postcondition: returns the maximum depth of t, where an empty tree
+	//               has depth 0, a tree with one node has depth 1, etc
+	public static int maxDepth(TreeNode t)
+	{
+ 		if (t == null)
+ 		    return 0;
+ 		return 1 + Math.max(maxDepth(t.getLeft()), maxDepth(t.getRight()));
+	}
+
+	//useful method for building a randomly shaped
+	//tree of a given maximum depth
+	public static TreeNode createRandom(int depth)
+	{
+		if (Math.random() * Math.pow(2, depth) < 1)
+			return null;
+		return new TreeNode(((int)(Math.random() * 10)),
+			createRandom(depth - 1),
+			createRandom(depth - 1));
+	}
+
+	//returns the number of nodes in t
+	//(yes, even leaves are nodes!)
+	public static int countNodes(TreeNode t)
+	{
+		if (t == null)
+		    return 0;
+		return 1 + countNodes(t.getLeft()) + countNodes(t.getRight());
+	}
+
+	//returns the number of leaves in t
+	public static int countLeaves(TreeNode t)
+	{
+	    if (t == null)
+	        return 0;
+		if (t.getRight() == null && t.getLeft() == null)
+		    return 1;
+		return countLeaves(t.getLeft()) + countLeaves(t.getRight());
+	}
+
+	//postcondition: each node in t has been lit up on display
+	//               in a pre-order traversal
+	public static void preOrder(TreeNode t, TreeDisplay display)
+	{
+	    if (t!=null)
+	    {
+    	    display.visit(t);
+    		preOrder(t.getLeft(), display);
+    		preOrder(t.getRight(), display);
+	    }
+	}
+
+	//postcondition: each node in t has been lit up on display
+	//               in an in-order traversal
+	public static void inOrder(TreeNode t, TreeDisplay display)
+	{
+	    if (t!=null)
+	    {
+    	    inOrder(t.getLeft(), display);
+    	    display.visit(t);
+    	    inOrder(t.getRight(), display);
+	    }
+	}
+
+	/**
+	 * <b>Method: </b>postOrder()</br> 
+	 * <b>Usage: </b>{@code TreeUtil.postOrder(tree, display)}</br>
+	 * -------------------------------</br>
+	 * Traverses the tree in a postOrder manner. 
+	 * <ul>
+	 *     <li>Base Case: tree is null </li>
+	 *     <li>Reduction: go deep left then right, and visit the elements coming back up </li>
+	 * </ul>
+	 * 
+	 * @param t - tree to traverse
+	 * @param display to show traversal on
+	 */
+	public static void postOrder(TreeNode t, TreeDisplay display)
+	{
+	    if (t!=null)
+        {
+            postOrder(t.getLeft(), display);
+            postOrder(t.getRight(), display);
+            display.visit(t);
+        }
+	}
+	
+	/**
+	 * <b>Method: </b>fillList</br> 
+	 * <b>Usage: </b>{@code TreeUtil.fillList(tree, list)}</br>
+	 * -------------------------------</br>
+	 * Fills the given list with the given tree with an preOrder traversal. 
+	 * <ul>
+	 *     <li>Base Case: no further tree adds an '$' to the list </li>
+	 *     <li>Reduction: element.toString() is added. List is further filled with a tree from each branch </li>
+	 * </ul>
+	 * 
+	 * @param t - tree to fill list from
+	 * @param list to store String representation of the specified tree
+	 */
+	public static void fillList(TreeNode t, List<String> list)
+	{
+	    if (t == null) 
+	        list.add("$");
+	    else
+	    {
+	        list.add(t.getValue().toString());
+	        fillList(t.getLeft(), list);
+	        fillList(t.getRight(), list);
+	    }
+	}
+
+	//saves the contents of t to a file with given name
+	/**
+	 * <b>Method: </b>saveTree</br> 
+	 * <b>Usage: </b>{@code TreeUtil.saveTree(location, tree)}</br>
+	 * -------------------------------</br>
+	 * Saves the specified tree as a text file at the specified location. </br>
+	 * An ArrayList is filled with representation of a tree and FileUtil.saveFile() saves the list as a text file representation.
+	 * 
+	 * @param fileName
+	 * @param t
+	 */
+	public static void saveTree(String fileName, TreeNode t)
+	{
+	    List<String> list = new ArrayList<String>();
+	    fillList(t, list);
+		FileUtil.saveFile(fileName, list.iterator());
+	}
+	
+	/**
+	 * <b>Method: </b>buildTree</br> 
+	 * <b>Usage: </b>{@code TreeUtil.buildTree(it)}</br>
+	 * -------------------------------</br>
+	 * Creates and returns a tree from the given iterator of a list of tree elements. </br>
+	 * <ul>
+	 *     <li>Base Case: next element is $ and no further branches are created. </li>
+	 *     <li>Reduction: create a new node with given value, set its branches as trees from buildTree, and return the node. </li>
+	 * </ul>
+	 * 
+	 * @param it - iterator of list of elements to use
+	 * @return tree built as specified in the list
+	 */
+	public static TreeNode buildTree(Iterator<String> it)
+	{
+		String value = it.next();
+		if (value.equals("$"))
+		    return null;
+		
+		TreeNode t = new TreeNode(value);
+		t.setLeft(buildTree(it));
+		t.setRight(buildTree(it));
+		return t;
+	}
+
+	/**
+	 * <b>Method: </b>loadTree</br> 
+	 * <b>Usage: </b>{@code TreeUtil.loadTree(location)}</br>
+	 * -------------------------------</br>
+	 * Returns a tree from buildTree() with a text file loaded using FileUtil.loadFile() at the given location.
+	 * 
+	 * @param fileName - location & name of the file 
+	 * @return binary tree representation of specified file
+	 */
+	public static TreeNode loadTree(String fileName)
+	{
+		return buildTree(FileUtil.loadFile(fileName));
+	}
+
+	/**
+	 * <b>Method: </b>getUserInput</br> 
+	 * <b>Usage: </b>{@code getUserInput()}</br>
+	 * -------------------------------</br>
+	 * Return one line of the user's input from Console input stream. 
+	 * 
+	 * @return user's input as String
+	 */
+	private static String getUserInput()
+	{
+		return in.nextLine();
+	}
+
+	//postcondition:  plays a round of twenty questions, asking the user questions as it
+	//                walks down the given knowledge tree, lighting up the display as it goes;
+	//                modifies the tree to include information learned.
+	public static void twentyQuestionsRound(TreeNode t, TreeDisplay display)
+	{
+	    display.visit(t);
+	    String prev = t.getValue().toString();
+	    
+		System.out.print("Is it " + prev + "? ");
+		String response = getUserInput();
+		
+		if (t.getLeft()==null && t.getRight()==null)
+		{
+    		if (response.equals("no"))
+    		{
+    		    System.out.print("I give up. What is it? ");
+    		    String ans = getUserInput();
+    		    
+    		    System.out.println("What distinguishes " + ans + " from " + prev + "?");
+    		    System.out.print(ans + " is ");
+    		    String diff = getUserInput();
+    		    System.out.println();
+    		    
+    		    t.setValue(diff);
+    		    t.setLeft(new TreeNode(ans));
+    		    t.setRight(new TreeNode(prev));
+    		    
+    		    display.displayTree(t);
+    		}
+    		else
+    		    System.out.println("I win!");
+		}
+		else
+		{
+		    if (response.equals("yes")) twentyQuestionsRound(t.getLeft(), display);
+		    else twentyQuestionsRound(t.getRight(), display);
+		}
+	}
+
+	//postcondition:  plays a game of twenty questions
+	public static void twentyQuestions()
+	{	
+		TreeNode gameTree = loadTree("C:/Google Drive/Programming/Java/Binary Trees/knowledge.txt");
+		TreeDisplay display = new TreeDisplay();
+		display.displayTree(gameTree);
+		
+		while (true)
+		{
+    		System.out.print("Think of a person or thing! Press enter when ready ");
+    		getUserInput();
+    		
+    		twentyQuestionsRound(gameTree, display);
+    		saveTree("C:/Google Drive/Programming/Java/Binary Trees/knowledge.txt", gameTree);
+		}
+	}
+
+	//postcondition:  returns a new tree, which is a complete copy
+	//                of t with all new TreeNode objects pointing
+	//                to the same values as t (in the same order, shape, etc)
+	public static TreeNode copy(TreeNode t)
+	{
+		throw new RuntimeException("Implement me!");
+	}
+
+	//postcondition:  returns true if t1 and t2 have the same
+	//                shape (but not necessarily the same values);
+	//                otherwise, returns false
+	public static boolean sameShape(TreeNode t1, TreeNode t2)
+	{
+		throw new RuntimeException("Implement me!");
+	}
+
+	//postcondition:  returns a tree for decoding Morse code
+	public static TreeNode createDecodingTree(TreeDisplay display)
+	{
+		TreeNode tree = new TreeNode("Morse Tree");
+		display.displayTree(tree);
+		insertMorse(tree, "a", ".-", display);
+		insertMorse(tree, "b", "-...", display);
+		insertMorse(tree, "c", "-.-.", display);
+		insertMorse(tree, "d", "-..", display);
+		insertMorse(tree, "e", ".", display);
+		insertMorse(tree, "f", "..-.", display);
+		insertMorse(tree, "g", "--.", display);
+		insertMorse(tree, "h", "....", display);
+		insertMorse(tree, "i", "..", display);
+		insertMorse(tree, "j", ".---", display);
+		insertMorse(tree, "k", "-.-", display);
+		insertMorse(tree, "l", ".-..", display);
+		insertMorse(tree, "m", "--", display);
+		insertMorse(tree, "n", "-.", display);
+		insertMorse(tree, "o", "---", display);
+		insertMorse(tree, "p", ".--.", display);
+		insertMorse(tree, "q", "--.-", display);
+		insertMorse(tree, "r", ".-.", display);
+		insertMorse(tree, "s", "...", display);
+		insertMorse(tree, "t", "-", display);
+		insertMorse(tree, "u", "..-", display);
+		insertMorse(tree, "v", "...-", display);
+		insertMorse(tree, "w", ".--", display);
+		insertMorse(tree, "x", "-..-", display);
+		insertMorse(tree, "y", "-.--", display);
+		insertMorse(tree, "z", "--..", display);
+		return tree;
+	}
+
+	//postcondition:  inserts the given letter into the decodingTree,
+	//                in the appropriate position, as determined by
+	//                the given Morse code sequence; lights up the display
+	//                as it walks down the tree
+	private static void insertMorse(TreeNode decodingTree, String letter,
+									String code, TreeDisplay display)
+	{
+		throw new RuntimeException("Implement me!");
+	}
+
+	//precondition:  ciphertext is Morse code, consisting of dots, dashes, and spaces
+	//postcondition: uses the given decodingTree to return the decoded message;
+	//               lights up the display as it walks down the tree
+	public static String decodeMorse(TreeNode decodingTree, String cipherText, TreeDisplay display)
+	{
+		throw new RuntimeException("Implement me!");
+	}
+
+}

@@ -1,0 +1,420 @@
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.*;
+
+/**
+ * MyArrayList is a list of elements in array form, but it can be freely manipulated
+ * 
+ * @author Dennis Moon
+ *
+ * @param <E> - class of elements to be put into this ArrayList
+ */
+public class MyArrayList<E>
+{
+	private int size;
+	private Object[] values;  //(Java doesn't let us make an array of type E)
+	private int listChangeCount;
+
+	/**
+	 * Constructor: MyArrayList()
+	 * Usage: MyArrayList name = new MyArrayList();
+	 * -----------------------------------------------
+	 * 
+	 * constructor for MyArrayList<E> class
+	 * it sets size to 0 and makes an object array with 1 cell 
+	 */
+	public MyArrayList()
+	{
+		size = 0;
+		values = new Object[1];
+		listChangeCount = 0;
+	}
+
+	public String toString()
+	{
+		if (size == 0)
+			return "[]";
+
+		String s = "[";
+		for (int i = 0; i < size - 1; i++)
+			s += values[i] + ", ";
+		return s + values[size - 1] + "]";
+	}
+
+	/**
+	 * Method: doubleCapacity()
+	 * Usage: this.doubleCapacity()
+	 * -------------------------------------------------
+	 * Replaces the current array with one that is twice as long,
+	 * and copies all of the old elements into it
+	 * Only called by add() methods in this class
+	 */
+	private void doubleCapacity()
+	{
+	    Object[] oldValues = values;
+	    values = new Object[oldValues.length*2];
+	    
+	    for (int i=0; i<oldValues.length; i++)
+	        values[i] = oldValues[i];
+	}
+
+	/**
+	 * Method: getCapacity()
+	 * Usuage: int lengthOfArray = MyArrayList.getCapacity();
+	 * -----------------------------------------------------
+	 * @return length of the array
+	 */
+	public int getCapacity()
+	{
+		return values.length;
+	}
+
+	/**
+	 * Method: size()
+	 * Usage: int sizeOfArray = MyArrayList.size();
+	 * ---------------------------------------------------
+	 * returns the number of elements in this ArrayList, 
+	 * not the number of cells of the array
+	 * 
+	 * @return size - number of elements in this ArrayList
+	 */
+	public int size()
+	{
+		return size;
+	}
+
+	/**
+	 * Method: get(int index)
+	 * Usage: E element = MyArrayList.get(index);
+	 * ------------------------------------------------
+	 * @param index - index of the object wanted
+	 * @return obj - at the given index
+	 */
+	public E get(int index)
+	{
+	    if (size==0)
+	        throw new IndexOutOfBoundsException("Index: 0, Size: 0");
+		return (E)values[index];
+
+		//(You will need to promise the return value is of type E.)
+	}
+
+	/**
+	 * Method: set(int index, E obj)
+	 * Usage: MyArrayList.set(index, object);
+	 * ---------------------------------------
+	 * Replaces the object at the given index witht he given object
+	 * 
+	 * @param index - of the object to be replaced
+	 * @param obj - to replace the former object at the given index
+	 * @return oldObject - the former object that was replaced
+	 */
+	public E set(int index, E obj)
+	{
+		Object oldObject = values[index];
+		
+		values[index] = obj;
+		
+		listChangeCount++;
+		
+		return (E) oldObject;
+
+		//(You will need to promise the return value is of type E.)
+	}
+
+	/**
+	 * Method: add(E obj)
+	 * Usage: MyArrayList.add(object);
+	 * -----------------------------------------
+	 * Adds the given object behind the last element,
+	 * but calls doubleCapacity() if there are no more cells 
+	 * 
+	 * @param obj - the object to be added
+	 * @return true - this method should never fails
+	 */
+	//postcondition: appends obj to end of list; returns true
+	public boolean add(E obj)
+	{
+		/* if values is already full, call doubleCapacity before adding */
+		if (size==getCapacity())
+		    doubleCapacity();
+		
+		values[size]=obj;
+		
+		size++;
+		listChangeCount++;
+		
+		return true;
+	}
+
+	/**
+	 * Method: remove(int index)
+	 * Usage: E oldObject = MyArrayList.remove(index);
+	 * ------------------------------------------------
+	 * Removes the element at the given index and slides the all the elements after it one index down
+	 * returns the removed object
+	 * 
+	 * @param index - of the element to be removed
+	 * @return oldObject - the element that was removed from the list
+	 */
+	public E remove(int index)
+	{
+		Object oldObject = values[index];
+		size--;
+		
+		for (int i=index; i<size; i++)
+		    values[i] = values[i+1];
+		values[size]=null;
+		
+		listChangeCount++;
+
+		return (E) oldObject;
+
+		//(You will need to promise the return value is of type E.)
+	}
+	
+	/**
+	 * Method: remove(E obj)
+	 * Usage: boolean executed = MyArrayList.remove(object);
+	 * --------------------------------------------------------
+	 * removes the first occurrence of the given object and returns true,
+	 * but returns false if such object does not exist
+	 * 
+	 * @param obj - object to be removed from the list
+	 * @return boolean - whether the obj was found and removed
+	 */
+	public boolean remove(E obj)
+	{
+	    for (int i=0; i<size; i++)
+	    {
+	        if (values[i].equals(obj))
+	        {
+	            remove(i);
+	            listChangeCount++;
+	            return true;
+	        }
+	    }
+	    return false;
+	}
+
+	/**
+	 * Method: add(int index, E obj)
+	 * Usage: MyArrayList.add(index, object);
+	 * -------------------------------------------
+	 * Slides all elements at indices higher than the given index one index to the right
+	 * Inserts the given object at the given index
+	 * 
+	 * precondition: 0 <= index <= size
+	 * 
+	 * @param index - of the object to be added
+	 * @param obj - object to be added
+	 */
+	public void add(int index, E obj)
+	{
+	    if (size==getCapacity())
+	        doubleCapacity();
+	    
+	    for (int i=size-1; i>index; i--)
+	        values[i] = values[i-1];
+	    values[index] = obj;
+	    
+	    size++;
+	    listChangeCount++;
+	}
+	
+	/**
+	 * Method: contains()
+	 * Usage: MyArrayList.contains(object)
+	 * ----------------------------------------------
+	 * Goes through the array to check if the given object exists in this ArrayList
+	 * 
+	 * @param obj - object to be seen if it is in the ArrayList
+	 * @return boolean - true if obj exists
+	 */
+	public boolean contains(E obj)
+	{
+	    for (Object o : values)
+	    {
+	        if (o.equals(obj))
+	            return true;
+	    }
+	    return false;
+	}
+	
+	/**
+	 * Method: iterator()
+	 * Usage: Iterator<E> = MyArrayList.iterator();
+	 * ---------------------------------------------
+	 * @return iterator of this ArrayList
+	 */
+	public Iterator<E> iterator()
+    {
+        return new MyArrayListIterator();
+    }
+    
+	/**
+	 * Method: listIterator()
+	 * Usage: MyListIterator<E> = MyArrayList.listIterator();
+	 * --------------------------------------------------------
+	 * @return listIterator of this ArrayList
+	 */
+    public MyListIterator<E> listIterator()
+    {
+        return new MyArrayListListIterator();
+    }
+    
+    
+    /**
+     * MyArrayListIterator is an iterator for the class MyArrayList
+     * it can check for hasNext(), and return the next element with next(), and remove the element just returned by next()
+     * but it cannot go backwards, or add to the list
+     * @author Dennis Moon
+     */
+	private class MyArrayListIterator implements Iterator<E>
+	{
+		//the index of the value that will be returned by next()
+		private int nextIndex;
+		private int lastReturned;
+		private int itrChangeCount;
+
+		/**
+		 * Constructor: MyArrayListIterator()
+		 * Usage: return new MyArrayListIterator();
+		 * ---------------------------------------------
+		 * constructor for an iterator for a MyArrayList
+		 * it sets nextIndex to 0 and sets initialSize to the size of the ArrayList when this iterator was made
+		 * only to be created and returned by MyArrayList
+		 */
+		public MyArrayListIterator()
+		{
+			nextIndex = 0;
+			lastReturned = -1;
+			listChangeCount = 0;
+			itrChangeCount = listChangeCount;
+		}
+ 
+		/**
+		 * Method: hasNext()
+		 * Usage: if(it.hasNext()) call next();
+		 * -----------------------------------------
+         * hasNext tells if the next element, not cell, exists or not
+         * if the size of the ArrayList has increased since this iterator was made, it throws a ConcurrentModificationError
+         * 
+         * @return boolean - true if the next cell is not null
+         */
+		public boolean hasNext()
+		{
+			return nextIndex != size();
+		}
+		
+		/**
+		 * Method: next()
+		 * Usage: E nextObj = it.next();
+		 * --------------------------------------------
+		 * increases nextIndex by 1
+		 * Returns the next element in the iteration.
+		 * 
+		 * @return next element in the list
+		 */
+		public E next()
+		{	
+		    if (itrChangeCount!=listChangeCount)
+                throw new ConcurrentModificationException("Underlying list cannot be changed by anything other than iterator methods when being iterated");
+		    
+		    lastReturned = nextIndex;
+			nextIndex++;
+			
+			if (nextIndex==size())
+			    throw new NoSuchElementException();
+			
+			return (E) get(lastReturned);
+			//(You will need to promise the return value is of type E.)
+		}
+
+		/**
+		 * Method: remove()
+		 * Usage: it.remove();
+		 * -------------------------------------------
+		 * 
+		 * Removes from the underlying collection the last element returned by this iterator (optional operation). 
+		 * This method can be called only once per call to next. The behavior of an iterator is unspecified if the 
+		 * underlying collection is modified while the iteration is in progress in any way other than by calling this method.
+		 */
+		public void remove()
+		{		
+		    MyArrayList.this.remove(lastReturned);
+		    nextIndex--;
+			lastReturned = -1;
+			itrChangeCount++;
+		}
+	}
+	
+	/**
+	 * ListIterator is a more advanced version of an iterator that can do everything a iterator can
+	 * ListIterator can add and set, go backwards, and the get indices of next&previous elements
+	 * @author Dennis Moon
+	 */
+	private class MyArrayListListIterator implements MyListIterator<E>
+    {
+        //the index of the value that will be returned by next()
+        private int nextIndex;
+        //true if next() was called, false if previous() was called, used for set()
+        private int lastReturned;
+        private int itrChangeCount;
+        
+        /**
+         * Constructor: MyArrayListListIterator()
+         * Usage: 
+         * constructor for a listIterator for MyArrayList class
+         * sets the nextIndex to zero
+         */
+        public MyArrayListListIterator()
+        {
+            nextIndex = 0;
+            lastReturned = -1;
+            listChangeCount = 0;
+            itrChangeCount = listChangeCount;
+        }
+        
+        public boolean hasNext()
+        {     
+            return nextIndex != size();
+        }
+        
+        public E next()
+        {   
+            if (itrChangeCount!=listChangeCount)
+                throw new ConcurrentModificationException("Underlying list cannot be changed by anything other than iterator methods when being iterated");
+            
+            lastReturned = nextIndex;
+            nextIndex++;
+            
+            if (nextIndex==size())
+                throw new NoSuchElementException();
+            
+            return (E) get(lastReturned);
+            //(You will need to promise the return value is of type E.)
+        }
+
+        public void remove()
+        {
+            MyArrayList.this.remove(lastReturned);
+            nextIndex = lastReturned;
+            lastReturned = -1;
+            itrChangeCount++;
+        }
+        
+        public void set(E obj)
+        {
+            MyArrayList.this.set(lastReturned, obj);
+            lastReturned = -1;
+            itrChangeCount++;
+        }
+
+        public void add(E obj)
+        {   
+            MyArrayList.this.add(nextIndex, obj);  
+            itrChangeCount++;
+        }
+    }
+}

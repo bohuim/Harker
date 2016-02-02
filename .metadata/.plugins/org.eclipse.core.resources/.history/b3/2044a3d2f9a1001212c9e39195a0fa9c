@@ -1,0 +1,34 @@
+public class Rectangle
+{
+	private int length;
+	private int width;
+
+	public Rectangle(int len, int w)
+	{
+		length = len;
+		width = w;
+	}
+
+	public int getLength()
+	{
+		return length;
+	}
+
+	public int getWidth()
+	{
+		return width;
+	}
+	
+	public boolean equals(Object obj)
+	{
+	    Rectangle comp = (Rectangle)obj;
+	    if (length==comp.getLength() && width==comp.getWidth())
+	        return true;
+	    return false;
+	}
+
+	public String toString()
+	{
+		return length + "x" + width;
+	}
+}

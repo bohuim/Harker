@@ -1,0 +1,122 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: milk2
+*/
+public class milk2
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out, true);
+        
+//        BufferedReader f = new BufferedReader(new FileReader("milk2.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("milk2.out")));
+        
+        int n = Integer.parseInt(f.readLine());
+        milk2 m = new milk2();
+        Period[] list = new Period[n];
+        for (int i=0; i<n; i++)
+        {
+            StringTokenizer st = new StringTokenizer(f.readLine());
+            list[i] = m.createPeriod(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+        }
+        Arrays.sort(list);
+        
+        ArrayList<Period> cont = new ArrayList<Period>();
+        cont.add(m.createPeriod(list[0].start, list[0].end));
+        Period current = cont.get(0);
+        for (int i=1; i<n; i++)
+        {
+            if (current.overlaps(list[i]))
+            {
+                current.changeEnd(list[i].end);
+            }
+            else
+            {
+                current = m.createPeriod(list[i].start, list[i].end);
+                cont.add(current);
+            }
+        }
+        Period maxCont = cont.get(0);
+        for (int i=1; i<cont.size(); i++)
+            if (cont.get(i).diff() > maxCont.diff())
+                maxCont = cont.get(i);
+        
+        int maxEmpty = 0;
+        if (cont.size()>1)
+        {
+            for (int i=1; i<cont.size(); i++)
+                if (cont.get(i).start - cont.get(i-1).end > maxEmpty && !(cont.get(i).end<maxCont.end))
+                    maxEmpty  = cont.get(i).start - cont.get(i-1).end;
+        }
+        
+        out.print(maxCont.diff() + " ");
+        out.print(maxEmpty);
+        out.println();
+        out.close();
+        System.exit(0);
+    }
+    
+    public Period createPeriod(int start, int end)
+    {
+        return new Period(start, end);
+    }
+    
+    class Period implements Comparable
+    {
+        private int start;
+        private int end;
+        
+        Period(int s, int e)
+        {
+            start = s;
+            end = e;
+        }
+        
+        public void changeEnd(int e)
+        {
+            end = e;
+        }
+        
+        public int diff()
+        {
+            return end-start;
+        }
+        
+        public boolean overlaps(Period p)
+        {
+            if (p.start<end && p.end>end)
+                return true;
+            return false;
+        }
+
+        /**<b>Method: </b></br> 
+         * <b>Usage: </b>{@code }</br>
+         * -------------------------------</br>
+         * 
+         * @param o
+         * @return
+         */
+        @Override
+        public int compareTo(Object o)
+        {
+            Period p = (Period) o;
+            if (start < p.start)
+                return -2;
+            if (start == p.start)
+            {
+                if (end < p.end)
+                    return -1;
+                if (end > p.end)
+                    return 1;
+                if (end == p.end)
+                    return 0;
+            }
+            return 0;
+        }
+    }
+}

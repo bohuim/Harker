@@ -1,0 +1,36 @@
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: ride
+*/
+import java.io.*;
+import java.util.*;
+
+public class ride
+{
+
+    public static void main (String [] args) throws IOException 
+    {
+        System.out.println(("Z").compareTo("A")+1);
+        
+        BufferedReader f = new BufferedReader(new FileReader("ride.in"));
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("ride.out")));
+        // Use StringTokenizer vs. readLine/split -- lots faster
+        StringTokenizer line1 = new StringTokenizer(f.readLine());
+        StringTokenizer line2 = new StringTokenizer(f.readLine());
+        
+        int prod1 = 1, prod2 = 1;
+        for (int i=0; i<line1.countTokens(); i++)
+            prod1 *= line1.nextToken().compareTo("A")+1;
+        for (int i=0; i<line2.countTokens(); i++)
+            prod2 *= line2.nextToken().compareTo("A")+1;
+        
+        if (prod1==prod2)
+            out.println("GO");                           // output result
+        else
+            out.println("STAY");
+        out.close();                                  // close the output file
+        System.exit(0);                               // don't omit this!
+      }
+}

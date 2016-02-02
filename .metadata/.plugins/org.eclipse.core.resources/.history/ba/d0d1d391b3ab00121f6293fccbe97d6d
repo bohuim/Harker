@@ -1,0 +1,53 @@
+import java.awt.Color;
+import java.util.*;
+/**
+ * 
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013
+ */
+public class Game
+{
+    
+    
+    public static void main(String[] args)
+    {
+        Board board = new Board();
+        
+        //King
+        Piece blackKing = (Piece) new King(Color.BLACK, directory("black_king"));
+        blackKing.putSelfInGrid(board, new Location(0, 7));
+        Piece whiteKing = (Piece) new King(Color.WHITE, directory("white_king"));
+        whiteKing.putSelfInGrid(board, new Location(7, 7));
+        //Rook
+        Piece blackRook = (Piece) new Rook(Color.BLACK, directory("black_rook"));
+        blackKing.putSelfInGrid(board, new Location(0, 0));
+        Piece whiteRook = (Piece) new Rook(Color.WHITE, directory("white_rook"));
+        whiteKing.putSelfInGrid(board, new Location(7, 7));
+        
+        BoardDisplay display = new BoardDisplay(board);
+        
+        Iterator<Location> it = whiteKing.destinations();
+        while (it.hasNext())
+        {
+            Location next = it.next();
+            System.out.println(next);
+            display.setColor(next, Color.LIGHT_GRAY);
+            try { Thread.sleep(200); }
+            catch(InterruptedException e){}
+        }
+    }
+    
+    private static String directory(String imgName)
+    {
+        return "C:/Google Drive/Programming/Java/Chess/images/" + imgName + ".gif";
+    }
+}

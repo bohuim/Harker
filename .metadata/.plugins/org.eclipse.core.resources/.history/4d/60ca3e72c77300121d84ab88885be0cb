@@ -1,0 +1,62 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: gift1
+*/
+public class gift1
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new FileReader("ride.in"));
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("ride.out")));
+        
+        int n = Integer.parseInt(f.readLine());
+        Person[] list = new Person[n];
+        for (int i=0; i<n; i++)
+        {
+            String name = f.readLine();
+            StringTokenizer st = new StringTokenizer(f.readLine());
+            int money = Integer.parseInt(st.nextToken());
+            int giving = Integer.parseInt(st.nextToken());
+            
+            list[i] = new Person(name, money, giving);
+        }
+    }
+    
+    class Person
+    {
+        String name;
+        int money;
+        Person[] list;
+        
+        int give, got;
+        
+        Person(String n, int dollar, int ppl)
+        {
+            name = n;
+            money = dollar;
+            list = new Person[ppl];
+            
+            give = ppl;
+            got = 0;
+        }
+        
+        void give(Person recepient)
+        {
+            
+        }
+        
+        void received()
+        {
+            got++;
+        }
+    }
+}

@@ -1,0 +1,120 @@
+
+/**
+ * Write a description of class Guitar here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+public class Guitar
+{
+    private WordGameDisplay display;
+    
+    private String userInput;
+    private int readIndex = 0;
+    private String[] temp = new String[3];
+    private int num = 0;
+    private int count = 0;
+    private int first;
+    private int second;
+    private double frequency = 65.41;
+    private double level = 2;
+    /** 
+     * 0: C 
+     * 1: C#/Db
+     * 2: D
+     * 3: D#/Eb
+     * 4: E
+     * 5: E#
+     * 6: F
+     * 7: F#
+     * 8: G
+     * 9: G#/Ab
+     * 10: A
+     * 11: B
+     * 12: Bb
+    */
+    
+    private GuitarString[][] note = new GuitarString[5][12];
+    {
+    	for (int i = 0; i < 5; i++) 
+    	{
+    		for (int n = 0; n < 12; n++)
+    		{
+    			setFrequency(n);
+    			note[i][n] = new GuitarString(level, frequency);
+    		}
+    	}
+    }
+    
+    public Guitar()
+    {
+        display = new WordGameDisplay();
+    }
+    
+    public void fretBoard()
+    {
+        userInput = display.getGuess().toLowerCase();
+        while (readIndex<userInput.length())
+        {
+        	userInput = display.getGuess().toLowerCase();
+        	checkNotes();
+        }
+    }
+    
+    private void checkNotes()
+    {
+    	num = 0;
+    	count = 0;
+    	while (readIndex<userInput.length() && !(userInput.substring(readIndex, readIndex+1).compareTo(",")==0))
+    	{
+    		if (count==1) num++;
+    		temp[num] += userInput.substring(readIndex,readIndex+1);
+    		readIndex++;
+    		
+    		count++;
+    	}
+    	setNote();
+    	note[second][first].playNote();
+    }
+    
+    private void setNote()
+    {
+    	if(temp[0].equals("cn")) first = 0;
+    	else if(temp[0].equals("cs") || temp[0].equals("db")) first = 1;
+    	else if(temp[0].equals("dn")) first = 2;
+    	else if(temp[0].equals("ds") || temp[0].equals("eb")) first = 3;
+    	else if(temp[0].equals("en")) first = 4;
+    	else if(temp[0].equals("es")) first = 5;
+    	else if(temp[0].equals("fn")) first = 6;
+    	else if(temp[0].equals("fs")) first = 7;
+    	else if(temp[0].equals("gn")) first = 8;
+    	else if(temp[0].equals("gs") || temp[0].equals("ab")) first = 9;
+    	else if(temp[0].equals("bb")) first = 10;
+    	else if(temp[0].equals("bs")) first = 11;
+    	
+    	if(temp[1].equals("2")) second = 0;
+    	else if(temp[1].equals("3")) second = 1;
+    	else if(temp[1].equals("4")) second = 2;
+    	else if(temp[1].equals("5")) second = 3;
+    	else if(temp[1].equals("6")) second = 4;
+    }
+    
+    // 	65.41	69.30	73.42	77.78	82.41	87.31	92.50	98.00	103.8	110.0	116.5	123.5
+    private void setFrequency(int h)
+    {
+    	if (h == 0) frequency = 65.41;
+    	else if (h == 1) frequency = 69.30;
+    	else if (h == 2) frequency = 73.42;
+    	else if (h == 3) frequency = 77.78;
+    	else if (h == 4) frequency = 82.41;
+    	else if (h == 5) frequency = 87.31;
+    	else if (h == 6) frequency = 92.50;
+    	else if (h == 7) frequency = 98.00;
+    	else if (h == 8) frequency = 103.8;
+    	else if (h == 9) frequency = 110.0;
+    	else if (h == 10) frequency = 116.5;
+    	else if (h == 11) frequency = 123.5;
+    }
+    
+    
+}

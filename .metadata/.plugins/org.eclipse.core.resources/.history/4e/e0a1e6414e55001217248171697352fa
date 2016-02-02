@@ -1,0 +1,19 @@
+Public Class Calculator
+{
+
+	//Method: 
+	public add (x, y)
+	{
+		return x+y;
+	}
+
+	public subtract (x, y)
+	{
+		return x-y;
+	}
+
+	public multiply (x, y)
+	{
+		return x*y;
+	}
+}

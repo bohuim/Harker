@@ -1,0 +1,17 @@
+
+/**
+ * 
+ * @author Dennis
+ *
+ */
+public class Main
+{
+    public static void main(String[] args)
+    {
+        MyBoundedGrid<Block> grid = new MyBoundedGrid<Block>(20,10);
+        MyBoundedGrid<Block> holdGrid = new MyBoundedGrid<Block>(5,5);
+        MyBoundedGrid<Block>[] nextGrids = new MyBoundedGrid[4];
+        
+        Display display = new Display(grid, holdGrid, nextGrids);
+    }
+}

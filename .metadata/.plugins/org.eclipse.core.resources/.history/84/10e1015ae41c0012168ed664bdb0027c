@@ -1,0 +1,83 @@
+import java.util.ArrayList;
+
+
+public class Control implements ArrowListener
+{
+    private boolean movementValid;
+    private Block block;
+    private int rotated = 0;
+
+    public Control()
+    {
+        
+    }
+    
+    /**
+     * Method: upPressed()
+     * Usage: control.upPressed()
+     * --------------------------
+     * rotates the block 90deg clockwise
+     */
+    public void upPressed()
+    {
+
+    }
+
+    /**
+     * Method: downPressed();
+     * Usage: control.downPressed();
+     * --------------------------
+     * moves the block 1 row down, regardless of the applied gravity
+     */
+    public void downPressed()
+    {
+
+    }
+
+    /**
+     * Method: leftPressed()
+     * Usage: control.leftPressed();
+     * --------------------------
+     * moves the block 1 column left if left is valid and it's not already occupied
+     */
+    public void leftPressed()
+    {
+
+    }
+
+    /**
+     * Method: rightPressed()
+     * Usage: control.rightPressed();
+     * --------------------------
+     * moves the block 1 column right if right is valid and it's not already occupied
+     */
+    public void rightPressed()
+    {
+
+    }
+    
+    /**
+     * Method: spacePressed()
+     * Usage: control.spacePressed();
+     * --------------------------
+     * drops the block straight down
+     */
+    public void spacePressed()
+    {
+
+    }
+    
+    /**
+     * 
+     */
+    public void shiftPressed()
+    {
+
+    }
+    
+
+    public void changeControl(Piece p)
+    {
+
+    }
+}

@@ -1,0 +1,219 @@
+import java.util.*;
+
+/**
+ * MyHashSet is a Set that contains a hashing table. 
+ * Elements are placed at the index produced by their {@code hashCode()} in an Array of LinkedList. </br>
+ * The Array of LinkedLists trades off time for space by placing some different objects into same indices, because the Array cannot be indefinitely large. </br></br>
+ * 
+ * <b>Methods</b>
+ * <ul>
+ *      <li>{@code size()} returns the number of elements in constant time</li>
+ *      <li>{@code contains(obj)} returns whether specified obj exists in the Set</li>
+ *      <li>{@code add(obj)} adds the specified obj and returns true if obj does not already exist</li>
+ *      <li>{@code remove(obj)} removes the specified obj and return true if obj exists</li>
+ *      <li>{@code toString()} returns a String representation of the elements in this HashSet</li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 10, 2013
+ * 
+ * @Revision
+ *     Apr 10, 2013 - class created and finished
+ */
+public class MyHashSet<E>
+{
+	private static final int NUM_BUCKETS = 5;
+	private LinkedList<E>[] buckets;
+	private int size;
+
+	/**
+	 * <b>Constructor: </b>MyHashSet</br> 
+	 * <b>Usage: </b>{@code MyHashSet<E> set = new MyHashSet<E>();}</br>
+	 * -------------------------------</br>
+	 * Creates an Array of LinkedLists to fill it with LinkedLists, and size is set to 0. </br>
+	 * 
+	 */
+	public MyHashSet()
+	{
+		buckets = new LinkedList[NUM_BUCKETS];
+		for (int i=0; i<buckets.length; i++)
+            buckets[i] = new LinkedList<E>();
+		size = 0;
+	}
+
+	/**
+	 * <b>Method: </b>toBucketIndex</br> 
+	 * <b>Usage: </b>{@code toBucketList}</br>
+	 * -------------------------------</br>
+	 * Returns the hash index of the specified obj by getting the mod of {@code hashcode()} and NUM_BUCKETS. </br>
+	 * 
+	 * @param obj to get hash index from
+	 * @return hash index of obj
+	 */
+	public static int toBucketIndex(Object obj)
+	{
+		return Math.abs(obj.hashCode()) % NUM_BUCKETS; 
+	}
+
+	/**
+	 * <b>Method: </b>size</br> 
+	 * <b>Usage: </b>{@code hashSet.size()}</br>
+	 * -------------------------------</br>
+	 * Returns the number of objects in the HashSet.
+	 * 
+	 * @return size of HashSet
+	 */
+	public int size()
+	{
+		return size;
+	}
+
+	/**
+	 * <b>Method: </b>contains</br> 
+	 * <b>Usage: </b>{@code HashSet.contains(obj)}</br>
+	 * -------------------------------</br>
+	 * Returns whether the specified object is in the HashSet by checking if the LinkedList at the produced index contains obj.
+	 * 
+	 * @param obj to find
+	 * @return true if obj is in HashSet
+	 */
+	public boolean contains(Object obj)
+	{
+		if (buckets[toBucketIndex(obj)].contains(obj))
+		    return true;
+		return false;
+	}
+
+	/**
+	 * <b>Method: </b>add</br> 
+	 * <b>Usage: </b>{@code HashSet.add(obj)}</br>
+	 * -------------------------------</br>
+	 * Adds the specified obj to the LinkedList at produced index if obj does not already exist and returns true; otherwise returns false. </br>
+	 * 
+	 * @param obj to add
+	 * @return true if obj was added
+	 */
+	public boolean add(E obj)
+	{
+		if (contains(obj)) return false;
+		
+		buckets[toBucketIndex(obj)].add(obj);
+		size++;
+		HashSet<Integer> set = new HashSet<Integer>();
+		return true;
+	}
+
+	/**
+	 * <b>Method: </b>remove</br> 
+	 * <b>Usage: </b>{@code HashSet.remove(obj)}</br>
+	 * -------------------------------</br>
+	 * Removes the specified obj from LinkedList at produced index if obj exists and returns true; otherwise returns false.
+	 * 
+	 * @param obj to remove
+	 * @return true if obj was removed
+	 */
+	public boolean remove(Object obj)
+	{
+		if (!contains(obj)) return false;
+		
+		buckets[toBucketIndex(obj)].remove(obj);
+		size--;
+		return true;
+	}
+
+	/**
+	 * <b>Method: </b>toString</br> 
+	 * <b>Usage: </b>{@code HashSet.toString()}</br>
+	 * -------------------------------</br>
+	 * Returns the string representation of this HashSet. </br>
+	 * 
+	 * @return string of this HashSet
+	 */
+	public String toString()
+	{
+		String s = "";
+		for (int i = 0; i < buckets.length; i++)
+			if (buckets[i].size() > 0)
+				s += i + ":" + buckets[i] + " ";
+		return s;
+	}
+	
+	/**
+	 * <b>Method: </b>iterator</br> 
+	 * <b>Usage: </b>{@code Iterator<E> it = HashSet.iterator();}</br>
+	 * -------------------------------</br>
+	 * Returns the iterator for the current HashSet
+	 * 
+	 * @return iterator of this HashSet
+	 */
+	public Iterator<E> iterator()
+	{
+	    return new MyHashSetIterator<E>();
+	}
+	
+	private class MyHashSetIterator<E> implements Iterator<E>
+	{
+	    private int remaining;
+	    private int bucketIndex;
+	    private Iterator<E> it;
+	    
+	    /**
+	     * <b>Constructor: </b>MyHashSetIterator</br> 
+	     * <b>Usage: </b>{@code return new MyHashSetIterator<E>();}</br>
+	     * -------------------------------</br>
+	     * Sets the bucketIndex to 0
+	     */
+	    public MyHashSetIterator()
+	    {
+	        remaining = MyHashSet.this.size;
+	        it = (Iterator<E>) buckets[0].iterator();
+	    }
+	    
+        /**<b>Method: </b>hasNext()</br> 
+         * <b>Usage: </b>{@code it.hasNext()}</br>
+         * -------------------------------</br>
+         * Returns whether more elements to iterate exist.
+         * If current LinkedList's iterator {@code hasNext()==true} or 
+         * 
+         * @return
+         */
+        public boolean hasNext()
+        {
+            if (remaining > 0 ) return true;
+            return false;
+        }
+
+        /**<b>Method: </b></br> 
+         * <b>Usage: </b>{@code }</br>
+         * -------------------------------</br>
+         * 
+         * @return
+         */
+        @Override
+        public E next()
+        {   
+            if (!hasNext()) throw new NoSuchElementException();
+            
+            if (it.hasNext())
+                return it.next();
+            
+            bucketIndex++;
+            while (bucketIndex<buckets.length && buckets[bucketIndex].isEmpty())
+                bucketIndex++;
+            it = (Iterator<E>) buckets[bucketIndex].iterator();
+            return next();
+        }
+
+        /**<b>Method: </b></br> 
+         * <b>Usage: </b>{@code }</br>
+         * -------------------------------</br>
+         * 
+         */
+        @Override
+        public void remove()
+        {
+            
+        }
+	    
+	}
+}

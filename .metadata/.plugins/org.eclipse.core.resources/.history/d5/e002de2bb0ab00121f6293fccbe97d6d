@@ -1,0 +1,54 @@
+import java.awt.Color;
+import java.util.*;
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013
+ */
+public class King extends Piece
+{
+
+    /**<b>Constructor: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * 
+     * @param col
+     * @param fileName
+     * @param val
+     */
+    public King(Color col, String fileName)
+    {
+        super(col, fileName, 1000);
+        
+    }
+
+    /**<b>Method: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * 
+     * @return
+     */
+    public Iterator<Location> destinations()
+    {
+        Set<Location> set = new HashSet<Location>();
+        int row = getLocation().getRow();
+        int col = getLocation().getCol();
+        for (int r=row-1; r<row+1; r++)
+            for (int c=col-1; c<col+1; c++)
+            {
+                Location dest = new Location(r,c);
+                if (isValidDestination(dest)))
+                    set.add(dest);
+            }
+        
+        return set.iterator();
+    }
+    
+}

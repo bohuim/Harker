@@ -1,0 +1,35 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: relay
+*/
+public class relay
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out, true);
+        
+        int n = Integer.parseInt(f.readLine());
+        int[] F = new int[n];
+        for (int i=0; i<n; i++)
+            F[i] = Integer.parseInt(f.readLine());
+        
+        boolean[] loopy = new boolean[n];
+        for (int i=0; i<n; n++)
+        {
+            int address = F[i];
+            if (address==-1)
+                loopy[i] = false;
+            else if ()
+        }
+    }
+    
+    public static int convert(int i)
+    {
+        return i-1;
+    }
+}

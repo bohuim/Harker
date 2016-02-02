@@ -1,0 +1,71 @@
+import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version May 20, 2013
+ * 
+ * @Revision
+ *     May 20, 2013
+ */
+public class ChessClient extends Game
+{
+    private Socket clientSocket;
+    
+    private BufferedReader in;
+    private PrintWriter out;
+    
+    public static void main(String[] args) throws IOException
+    {
+        ChessClient client = new ChessClient("192.168.1.82", 1807);
+        client.play();
+    }
+    
+    public ChessClient(String host, int port) throws IOException
+    {
+        connectToServer(host, port);
+        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        out = new PrintWriter(clientSocket.getOutputStream(), true);
+        
+        p1 = new NetworkPlayer("Enemy", Color.WHITE, board, in);
+        p2 = new NetworkHumanPlayer("Chris", Color.BLACK, board, display, out);
+    }
+    
+    /**
+     * <b>Method: </b>connectToServer</br> 
+     * <b>Usage: </b>{@code connectToServer(port)}</br>
+     * -------------------------------</br>
+     * Attempts to connect to the 
+     * 
+     * @param port
+     */
+    private void connectToServer(String host, int port)
+    {
+        try 
+        {
+            clientSocket = new Socket(host, port);  
+        } 
+        catch (UnknownHostException e) 
+        {
+            System.err.println("Don't know about host: " + host);
+            System.exit(1);
+        } 
+        catch (IOException e)
+        {
+            System.err.println("Couldn't get I/O for the connection to: " + host);
+            System.exit(1);
+        }
+    }
+}

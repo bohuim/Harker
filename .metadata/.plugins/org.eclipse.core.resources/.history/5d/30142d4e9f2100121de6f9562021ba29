@@ -1,0 +1,287 @@
+
+/**
+ * Main class the tetris runs in
+ * 
+ * @author Dennis Moon
+ */
+public class Tetris implements ArrowListener
+{
+    private MyBoundedGrid<Block> grid;
+    private MyBoundedGrid<Block> holdGrid;
+    private MyBoundedGrid<Block>[] nextGrids;
+    private BlockDisplay display;
+    
+    private Tetrad active;
+    private Tetrad hold;
+    private Tetrad[] next;
+    
+    private boolean switched;
+    private int linesCleared;
+    private int level;
+    
+    public Tetris()
+    {
+        grid = new MyBoundedGrid<Block>(20,10);
+        holdGrid = new MyBoundedGrid<Block>(4,4);
+        nextGrids = new MyBoundedGrid[5];
+        for (int i=0; i<nextGrids.length; i++)
+            nextGrids[i] = new MyBoundedGrid<Block>(4,4);
+        
+        display = new BlockDisplay(grid, holdGrid, nextGrids);
+        display.setTitle("Tetris");
+        display.setArrowListener(this);
+        
+        next = new Tetrad[5];
+        for (int i=0; i<next.length; i++)
+        {
+            next[i] = new Tetrad(grid);
+            next[i].addToSubGrid(nextGrids[i]);
+        }
+        
+        switched = false;
+        linesCleared = 0;
+        level = 10;
+    }
+    
+    public void play()
+    {
+        while(!gameOver())
+        {
+            getNext();
+            
+            try {Thread.sleep(500);}
+            catch (InterruptedException e){}
+            
+            while(downPressed())
+            {  
+                try {Thread.sleep(1000);}
+                catch (InterruptedException e){}
+            }
+            try {Thread.sleep(500);}
+            catch (InterruptedException e){}
+            
+            clearCompletedRows();
+            switched = false;
+        }
+        active = null;
+    }
+    
+    /**
+     * Method: gameOver()
+     * Usage: while(!gameOver())
+     * -----------------------------
+     * @return true if the very top row is filled
+     */
+    private boolean gameOver()
+    {
+        for (int c=0; c<grid.getNumCols(); c++)
+        {
+            if (grid.get(new Location(0,c))!=null) return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Method: isCompleteRow(int row)
+     * Usuage: isCompleteRow(row#)
+     * ----------------------------
+     * @param row - number to check
+     * @return true if the row is filled
+     */
+    private boolean isCompletedRow(int row)
+    {
+        int filled = 0;
+        for (int col=0; col<grid.getNumCols(); col++)
+        {
+            if (grid.get(new Location(row,col))!=null)
+                filled++;
+        }
+        
+        if (filled==grid.getNumCols())
+            return true;
+        return false;
+    }
+    
+    /**
+     * Method: clearRow(int row)
+     * Usage: clearRow(row#)
+     * ---------------------------
+     * clears the given row and shifts everything down one
+     * @param row - row to be cleared
+     */
+    private void clearRow(int row)
+    {
+        for (int c=0; c<grid.getNumCols(); c++)
+            grid.get(new Location(row,c)).removeSelfFromGrid();
+        
+        for (int r=row-1; r>0; r--)
+        {
+            for (int c=0; c<grid.getNumCols(); c++)
+            {
+                Location loc = new Location(r,c);
+                if (grid.get(loc)!=null)
+                    grid.get(loc).moveTo(loc.getAdjacentLocation(Location.SOUTH));
+            }
+        }
+    }
+    
+    /**
+     * Method: checkAndClear()
+     * Usage: checkAndClear()
+     * ----------------------
+     * checks all rows and clears any rows that are filled
+     */
+    private void clearCompletedRows()
+    {
+        int clearedNow = 0;
+        for (int row=0; row<grid.getNumRows(); row++)
+            if (isCompletedRow(row)) 
+            {
+                clearRow(row);
+                clearedNow++;
+                linesCleared++;
+            }
+        
+        level = (int)(linesCleared/5 + 1);
+        display.updateScore(level);
+    }
+    
+    /**
+     * Method: upPressed()
+     * Usage: upPressed()
+     * --------------------------
+     * rotates the block 90deg clockwise
+     */
+    public void upPressed()
+    {
+        if (active!=null)
+        {
+            active.rotate();
+            display.showMain();
+        }
+    }
+
+    /**
+     * Method: downPressed();
+     * Usage: downPressed();
+     * --------------------------
+     * moves the block 1 row down, regardless of the applied gravity
+     */
+    public boolean downPressed()
+    {
+        if (active!=null)
+        {
+            boolean executed = active.translate(Location.SOUTH);
+            display.showMain();
+            
+            return executed;
+        }
+        return false;
+    }
+
+    /**
+     * Method: leftPressed()
+     * Usage: leftPressed();
+     * --------------------------
+     * moves the block 1 column left if left is valid and it's not already occupied
+     */
+    public void leftPressed()
+    {
+        if (active!=null)
+        {
+            active.translate(Location.WEST);
+            display.showMain();
+        }
+    }
+
+    /**
+     * Method: rightPressed()
+     * Usage: rightPressed();
+     * --------------------------
+     * moves the block 1 column right if right is valid and it's not already occupied
+     */
+    public void rightPressed()
+    {
+        if (active!=null)
+        {
+            active.translate(Location.EAST);
+            display.showMain();
+        }
+    }
+    
+    /**
+     * Method: spacePressed()
+     * Usage: spacePressed();
+     * --------------------------
+     * drops the block straight down
+     */
+    public void spacePressed()
+    {
+        while (active.translate(Location.SOUTH)){}
+        display.showMain();
+        active=null;
+    }
+    
+    /**
+     * Method: shiftPressed()
+     * Usage: shiftPressed();
+     * ----------------------------
+     * switches the hold piece
+     */
+    public void shiftPressed()
+    {
+        if (!switched)
+        {
+            Tetrad temp = active;
+        
+            active.removeBlocks();                 
+            if (hold!=null)
+            {
+                hold.removeBlocks();
+                active = hold;
+                
+                active.addToMain();
+            }
+            else
+                getNext();
+            
+            hold = temp;
+            hold.addToSubGrid(holdGrid);
+            
+            display.showHold();
+            display.showMain();
+            display.showNext();
+            switched = true;
+        }
+    }
+    
+    /**
+     * Method: removeHold()
+     * Usage: Tetrad removedFromHold = getNext();
+     * -----------------------------------------------
+     * returns the next tetrad in line and shifts all tetrad up the line 
+     * then makes a new tetrad
+     */
+    private void getNext()
+    {
+        active = next[0];
+        
+        for (int i=0; i<next.length; i++)
+            next[i].removeBlocks();
+        for (int i=0; i<next.length-1; i++)
+        {
+            next[i] = next[i+1];
+            next[i].addToSubGrid(nextGrids[i]);
+        }
+        
+        next[4] = new Tetrad(grid);
+        while (next[4].equals(next[3]) && next[4].equals(next[2]))
+            next[4] = new Tetrad(grid);
+        next[4].addToSubGrid(nextGrids[4]);
+        
+        active.addToMain();
+        
+        display.showMain();
+        display.showNext();
+    }
+}

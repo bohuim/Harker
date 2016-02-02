@@ -1,0 +1,53 @@
+
+/**
+ * Write a description of class Guitar here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+public class Guitar
+{
+    private WordGameDisplay display;
+    
+    private String userInput;
+    
+    private GuitarString e = new GuitarString(330);
+    private GuitarString b = new GuitarString(247);
+    private GuitarString g = new GuitarString(196);
+    private GuitarString d = new GuitarString(147);
+    private GuitarString a = new GuitarString(110);
+    
+    public Guitar()
+    {
+        display = new WordGameDisplay();
+    }
+    
+    public void fretBoard()
+    {
+        userInput = display.getGuess().toLowerCase();
+        if (userInput.length()==1) checkNote();
+        else checkNotes();
+        
+    }
+    
+    public void checkNote()
+    {
+    	if (userInput.equals("e")) e.playNote();
+        else if (userInput.equals("b")) b.playNote();
+        else if (userInput.equals("g")) g.playNote();
+        else if (userInput.equals("d")) d.playNote();
+        else if (userInput.equals("a")) a.playNote();
+    }
+    
+    public void checkNotes()
+    {
+    	for (int i = 0; i < userInput.length(); i++)
+    	{
+    		if (userInput.substring(i,i+1).equals("e")) e.playNote();
+    		else if (userInput.substring(i,i+1).equals("b")) b.playNote();
+            else if (userInput.substring(i,i+1).equals("g")) g.playNote();
+            else if (userInput.substring(i,i+1).equals("d")) d.playNote();
+            else if (userInput.substring(i,i+1).equals("a")) a.playNote();
+    	}
+    }
+}

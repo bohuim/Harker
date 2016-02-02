@@ -1,0 +1,135 @@
+import java.awt.*;
+import java.util.*;
+
+/**
+ * Represents a rectangular game board, containing Piece objects, through a BoundedGrid. </br></br>
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li>{@code allMove(color)} returns a set of all moves available by Pieces of specified color </li>
+ *      <li>{@code executeMove(move)} executes a move by placing the specified Piece at the destination </li>
+ *      <li>{@code undoMove(move)} reverses a move by placing the specified Piece back to source location </li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 29, 2013
+ * 
+ * @Revision
+ *     Apr 29, 2013 - class created and added allMoves()
+ *     May 10, 2013 - modified so that executeMove() & undoMove() are part of the Move class
+ */
+public class Board extends BoundedGrid<Piece>
+{
+	/**
+	 * <b>Constructor: </b>Board</br> 
+	 * <b>Usage: </b>{@code Board board = new Board()}</br>
+	 * -------------------------------</br>
+	 * Creates a new BoundedGrid of dimension 8x8, replicating a Chess board.
+	 */
+	public Board()
+	{
+		super(8, 8);
+	}
+
+	/**
+	 * <b>Method: </b>allMoves</br> 
+	 * <b>Usage: </b>{@code board.allMoves(color)}</br>
+	 * -------------------------------</br>
+	 * Returns a set of all moves possible by all Pieces of the specified color. </br>
+	 * Checks all occupied locations for the specified color and adds its possible destinations as new Moves to set. </br>
+	 * 
+	 * @param color of Pieces to get moves from
+	 * @return Set of all moves possible by Pieces of specified color
+	 */
+	public Set<Move> allMoves(Color color)
+	{
+	    Set<Move> set = new HashSet<Move>();
+	    for(Location loc : getOccupiedLocations())
+	    {
+	        Piece target = get(loc);
+	        if (target.getColor().equals(color))
+	        {
+	            Iterator<Location> it = target.destinations();
+	            while (it.hasNext())
+	                set.add(new Move(target, it.next()));
+	        }
+	    }
+	    return set;
+	}
+	
+	private Piece findKing(Color color)
+	{
+	    int row = 0;
+        if (color.equals(Color.WHITE))
+            row = 7;
+        return get(new Location(row, 4));
+	}
+	
+	private Piece findRook(Color color, int dir)
+	{
+	    int row = 0;
+        if (color.equals(Color.WHITE))
+            row = 7;
+	    int col = 0;
+        if (dir == Location.EAST)
+            col = 7;
+        return get(new Location(row, col));
+	}
+	
+	public boolean checkCastle(Color color, int dir)
+	{
+	    Piece king = findKing(color);
+	    Piece rook = findRook(color, dir);
+	    Location rookLoc = rook.getLocation();
+	    
+	    //Check 1: piece is indeed a rook
+        if (!(king instanceof King && rook instanceof Rook))
+            return false;
+        
+        //Check 2: neither King/rook piece was moved
+        if (king.wasMoved() || rook.wasMoved()) return false;
+        
+        //Check 3: no pieces in between King&rook exists
+        Location targetLoc = king.getLocation().getAdjacentLocation(dir);
+        while (!targetLoc.equals(rookLoc))
+        {
+            if (get(targetLoc)!=null)
+                return false;
+            targetLoc = targetLoc.getAdjacentLocation(dir);
+        }
+        
+        //Check 4: King & locations between are not under attack
+        targetLoc = king.getLocation().getAdjacentLocation(dir);
+        while (!targetLoc.equals(rookLoc))
+        {
+            if (isUnderAttack(color, targetLoc))
+                return false;
+            targetLoc = targetLoc.getAdjacentLocation(dir);
+        }
+        return true;
+	}
+	
+	/**
+	 * <b>Method: </b>reverseColor</br> 
+	 * <b>Usage: </b>{@code reverseColor(color)}</br>
+	 * -------------------------------</br>
+	 * Returns the reverse of the given color. 
+	 * 
+	 * @param color to flip
+	 * @return flipped color
+	 */
+	private Color reverseColor(Color color)
+	{
+        if (color.equals(Color.BLACK))
+            return Color.WHITE;
+        return Color.BLACK;
+	}
+	
+	public boolean isUnderAttack(Color color, Location loc)
+    {
+        for (Move move : allMoves(reverseColor(color)))
+            if (move.getDestination().equals(loc))
+                return true;
+        return false;
+    }
+}

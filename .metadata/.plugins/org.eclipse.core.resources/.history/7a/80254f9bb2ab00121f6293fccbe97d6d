@@ -1,0 +1,56 @@
+import java.awt.Color;
+import java.util.*;
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013
+ */
+public class King extends Piece
+{
+
+    /**<b>Constructor: </b>King</br> 
+     * <b>Usage: </b>{@code new King(color,fileName)}</br>
+     * -------------------------------</br>
+     * Creates a King by calling constructor of superclass Piece with given color, fileName, and value of 1000.
+     * 
+     * @param color - team of this King
+     * @param fileName - img directory of this King
+     */
+    public King(Color color, String fileName)
+    {
+        super(color, fileName, 1000);
+    }
+
+    /**<b>Method: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * A King can move one step in any direction of its current location. </br>
+     * All locations from (row-1, row+
+     * 
+     * @return
+     */
+    public Iterator<Location> destinations()
+    {
+        Set<Location> set = new TreeSet<Location>();
+        
+        int row = getLocation().getRow();
+        int col = getLocation().getCol();
+        for (int r=row-1; r<row+2; r++)
+            for (int c=col-1; c<col+2; c++)
+            {
+                Location dest = new Location(r,c);
+                if (isValidDestination(dest))
+                    set.add(dest);
+            }
+        
+        return set.iterator();
+    }
+    
+}

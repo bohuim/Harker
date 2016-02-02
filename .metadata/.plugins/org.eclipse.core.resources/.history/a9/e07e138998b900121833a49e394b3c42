@@ -1,0 +1,31 @@
+
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version May 10, 2013
+ * 
+ * @Revision
+ *     May 10, 2013
+ */
+public class Castle extends Move
+{
+    Move kingMove;
+
+    /**<b>Constructor: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * 
+     * @param piece
+     * @param destination
+     */
+    public Castle(Piece king, Piece rook, int direction)
+    {
+        super(rook, rook.getLocation().getAdjacentLocation(direction+Location.HALF_CIRCLE).getAdjacentLocation(direction+Location.HALF_CIRCLE));
+    }
+    
+}

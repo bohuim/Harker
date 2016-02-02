@@ -1,0 +1,46 @@
+import java.awt.Color;
+import java.util.*;
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013
+ */
+public class Rook extends Piece
+{
+    /**<b>Constructor: </b>King</br> 
+     * <b>Usage: </b>{@code new King(color,fileName)}</br>
+     * -------------------------------</br>
+     * Creates a King by calling constructor of superclass Piece with given color, fileName, and value of 1000.
+     * 
+     * @param color - team of this King
+     * @param fileName - img directory of this King
+     */
+    public Rook(Color color, String fileName)
+    {
+        super(color, fileName, 5);
+    }
+    
+    /**<b>Method: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * A King can move one step in any direction of its current location. </br>
+     * All locations from [row-1, col-1] to  [row+1, col+1] are added to a Set and returned. </br>
+     * 
+     * @return set of all possible moves for a King
+     */
+    public Iterator<Location> destinations()
+    {
+        Set<Location> set = new HashSet<Location>();
+        for (int dir=0; dir<360; dir+=90)
+            sweep(set, dir);
+        return set.iterator();
+    }
+}

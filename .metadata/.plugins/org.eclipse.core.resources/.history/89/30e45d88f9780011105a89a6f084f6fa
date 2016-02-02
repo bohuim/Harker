@@ -1,0 +1,167 @@
+
+/**
+ * Write a description of class WordGame here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+public class WordGame extends WordGameDisplay
+{
+    // instance variables 
+    private String userInput = "";
+    private String input = "";
+    private String output = "";
+    private String reverseString = "";
+    private String history = "";
+    private String giantString = "";
+    
+    //constants
+    
+    /**
+     * the echo game method
+     * 
+     * @param  y   a sample parameter for a method
+     * 
+     */
+    public void echo()
+    {
+        setTitle("The Echo Game");
+        setText("Please Eneter a Word");
+        while (true)
+        {
+            input = getGuess();
+            setText("\"" + userInput + "\" is a word" + "\n" + "Please Enter a Word");
+        }
+    }
+    
+    
+    /**
+     * 
+     * converts an input string into with only lower case letters and returns a output string
+     */
+    private String onlyLetters()
+    {
+        userInput = getGuess();
+        input = userInput.toLowerCase();
+        for (int i = 0; i<input.length(); i++)
+        {
+            int diff = input.substring(i,i+1).compareTo("a");
+            if (diff >= 0 && diff <= 25)
+                output = output + input.substring(i,i+1);
+        }
+        return output;
+    }
+    /**
+     * runs the lower case letters program
+     */
+     public void lowerCaseLetters()
+    {
+        setTitle("Only Lower Case");
+        setText("Please Enter a String");
+        setText(onlyLetters());
+    }
+    
+ 
+    /**
+     * checks if an input string is a palindrome or not, returns accordingly 
+     */
+    private boolean isPalindrome()
+    {
+        if (input.length() == 0 || input.length() == 1)
+            return true;
+        else 
+        {
+            assembleBackwards();
+            if (reverseString.equals(input))
+            {
+                reverseString = "";
+                return true;
+            }
+            reverseString = "";
+        }
+        return false;
+    }
+    /**
+     * reassembles an input string backwards into a string named reverseString
+     */
+    private void assembleBackwards()
+    {
+        for (int i = input.length(); i >= 1; i--)
+            reverseString = reverseString + input.substring(i-1,i);
+    }
+    /**
+     * takes a input: converts it into lower case letters, then checks the input with its reverseString
+     * 
+     */
+    public void palindrome()
+    {
+        setTitle("Palindrome");
+        setText("Please Enter a Palindrome or Nothing to Stop Playing");
+        int submitCount = 1;
+        int contGame = 0; // 0 is yes, 1 is no
+        while (contGame == 0)
+        {
+            onlyLetters();
+            input = output;
+            if (isPalindrome())
+            {
+                if (submitCount > 1)
+                    history = history + "\n" + submitCount + ". " + "\"" + userInput + "\"" + " is a palindrome";
+                else
+                    history = "" + submitCount + ". " + "\"" + userInput + "\"" + " is a palindrome";
+            }
+            else
+            {
+                if (submitCount > 1)
+                    history = history + "\n" + submitCount + ". " + "\"" + userInput + "\"" + " is not a palindrome";
+                else
+                    history = "" + submitCount + ". " + "\"" + userInput + "\"" + " is not a palindrome";
+            }
+            setText(history);
+            submitCount++;
+            output = "";
+            if (input.equals(""))
+                contGame = 1;
+        }
+        history = history + "\n" + "End of Game";
+        setText(history);
+    }
+    
+   /**
+       * readInput takes in a string containing a file name and
+       * then wraps a BufferedReader around a FileReader for that
+       * file. If the file is not found, or any other IO error
+       * occurs, an exception is thrown.
+       * @param filename is the input file name
+       * @return a String containing the input data
+    */
+    private String readInput()
+    {
+        try
+        {
+            BufferedReader in = new BufferedReader(new FileReader("C:/Users/Dennis/Dropbox/2011-2012 Sophomore/P4 - Adv. Prog/Projects/Word Game/StartingFiles/testDoc.txt"));
+            // read a line of text into the variable line
+            // end of line characters are discarded
+            // you may want to put them back!
+            String line = in.readLine();
+            String lines ="";
+            while (line != null)
+            {
+                // add code to append line to lines
+                line = in.readLine();
+            }
+            in.close();
+            return lines;
+        }
+        // in case of error ...
+        catch(IOException e)
+        {
+            RuntimeException up = new RuntimeException(e);
+            throw up;
+        }
+    }
+    /**
+     * 
+     */
+    private countOccurrences
+}

@@ -1,0 +1,107 @@
+/**
+ * Rectangle was created for the purpose of testing hashing methods and HashSets; therefore a Rectangle does not perform any actions. </br>
+ * It contains int instance fields {@code length} and {@code width} along with getter methods, {@code equals()}, and {@code hashCode()}. </br> </br>
+ * 
+ * <b>Methods</b>
+ * <ul>
+ *  <li>{@code getLength()} returns the length of Rectangle </li>
+ *  <li>{@code getWidth()} returns the width of Rectangle </li>
+ *  <li>{@code equals()} returns true only if Rectangles have same length & width </li>
+ *  <li>{@code hashCode()} returns a unique int for every dimension </li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 10, 2013
+ * 
+ * @Revision
+ *     Apr 10, 2013 - class created and finished
+ */
+public class Rectangle
+{
+	private int length;
+	private int width;
+
+	/**
+	 * <b>Constructor: </b>Rectangle</br> 
+	 * <b>Usage: </b>{@code Rectangle rect = new Rectangle(1, 4)}</br>
+	 * -------------------------------</br>
+	 * Creates a Rectangle of specified dimensions, which cannot be changed after instantiation. </br>
+	 * 
+	 * @param l - length of Rectangle
+	 * @param w - width of Rectangle
+	 */
+	public Rectangle(int l, int w)
+	{
+		length = l;
+		width = w;
+	}
+
+	/**
+	 * <b>Method: </b>getLength()</br> 
+	 * <b>Usage: </b>{@code Rect.getLenght()}</br>
+	 * -------------------------------</br>
+	 * Returns the length of this Rectangle.
+	 * 
+	 * @return length of this Rectangle
+	 */
+	public int getLength()
+	{
+		return length;
+	}
+
+	/**
+     * <b>Method: </b>getWidth()</br> 
+     * <b>Usage: </b>{@code Rect.getLenght()}</br>
+     * -------------------------------</br>
+     * Returns the width of this Rectangle.
+     * 
+     * @return width of this Rectangle
+     */
+	public int getWidth()
+	{
+		return width;
+	}
+	
+	/**
+	 * <b>Method: </b>equals</br> 
+	 * <b>Usage: </b>{@code Rect.equals(obj)}</br>
+	 * -------------------------------</br>
+	 * Two Rectangles are equal if their lengths are equal and their widths are equal
+	 * 
+	 * @precondition obj is a Rectangle
+	 * @param obj to compare this Rectangle to
+	 * @return true if dimensions are equal
+	 */
+	public boolean equals(Object obj)
+	{
+	    Rectangle comp = (Rectangle)obj;
+	    return length==comp.getLength() && width==comp.getWidth();
+	}
+	
+	/**
+	 * <b>Method: </b>hashCode</br> 
+	 * <b>Usage: </b>{@code Rect.hashCode()}</br>
+	 * -------------------------------</br>
+	 * Generates an unique int hashCode for each dimension by {@code length*31 + width*37}. </br>
+	 * Note that 43 and 67 are arbitary prime numbers. </br>
+	 * 
+	 * @return hashCode of this Rectangle
+	 */
+	public int hashCode()
+	{
+	    return length*43 + width*67;
+	}
+
+	/**
+	 * <b>Method: </b>toString()</br> 
+	 * <b>Usage: </b>{@code Rect.toString}</br>
+	 * -------------------------------</br>
+	 * Dimensions are given as String in the form of "length x width".
+	 * 
+	 * @return String representation of this Rectangle
+	 */
+	public String toString()
+	{
+		return length + "x" + width;
+	}
+}

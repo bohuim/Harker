@@ -1,0 +1,26 @@
+
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 26, 2013
+ * 
+ * @Revision
+ *     Apr 26, 2013
+ */
+public class HeapTester
+{
+    public static void main (String[] args)
+    {
+        MyHeap<Integer> h = new MyHeap<Integer>();
+        h.add(5);
+        h.add(9);
+        h.add(3);
+        System.out.println(h.toString());
+        h.heapUp(3);
+    }
+}

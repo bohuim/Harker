@@ -1,0 +1,40 @@
+import java.util.ArrayList;
+
+
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 26, 2013
+ * 
+ * @Revision
+ *     Apr 26, 2013
+ */
+public class MyHeap<E>
+{
+    private ArrayList<E> list;
+
+    public MyHeap()
+    {
+        list = new ArrayList<E>();
+    }
+    
+    private void heapUp(int index)
+    {
+        int parentIndex = index/2;
+        Comparable target = (Comparable) list.get(index);
+        Comparable parent = (Comparable) list.get(parentIndex);
+        if (target.compareTo(parent) < 0)
+        {
+            list.set(index, (E) parent);
+            list.set(parentIndex, (E) target);
+            heapUp(parentIndex/2);
+        }
+    }
+    
+    
+}

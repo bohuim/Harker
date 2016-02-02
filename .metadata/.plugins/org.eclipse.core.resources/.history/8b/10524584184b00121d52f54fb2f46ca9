@@ -1,0 +1,145 @@
+import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.Iterator;
+
+
+/**
+ * Main game class of Breakout
+ * 
+ * @author Dennis Moon
+ */
+public class Breakout extends KeyAdapter
+{
+    private ShapeDisplay display;
+    private Ball ball;
+    private Paddle paddle;
+    
+    /**
+     * Constructor: Breakout
+     * Usage: Breakout breakout = new Breakout()
+     * ---------------------------
+     * creates a new ShapeDisplay & sets title as "Breakout"
+     */
+    public Breakout()
+    {
+        display = new ShapeDisplay();
+        display.setTitle("Breakout");
+        display.addKeyListener(this);
+        
+        ball = new Ball();
+        display.add(ball);
+        
+        paddle = new Paddle();
+        display.add(paddle);
+        
+        setup();
+    }
+    
+    /**
+     * Method: setup()
+     * Usage: to be used in Breakout constructor
+     * -------------------------------
+     */
+    private void setup()
+    {
+        for (int i=0; i<12; i++)
+            for (int n=0; n<8; n++)
+            {
+                if (n<=4)
+                    display.add(new Brick(Color.RED, i*7+5, n*5+15));
+                else
+                    display.add(new Brick(Color.GREEN, i*7+5, n*5+15));
+            }
+    }
+    
+    /**
+     * Method: newBall()
+     * Usage: to be called when ball dies
+     * ---------------------------
+     */
+    private void newBall()
+    {
+        display.add(new Ball());
+        display.repaint();
+        
+        try { Thread.sleep(2000); }
+        catch(InterruptedException e) {}
+    }
+    
+    /**
+     * Method: checkForCollision()
+     * Usage: called every run in play
+     * ---------------------------
+     * calls ShapeDisplay's iterator of shapes in the display
+     * and if the shape is an obstacle that overlaps with the ball
+     * the ball's trajectory is changed 
+     */
+    private boolean checkForCollision()
+    {
+        Iterator<Shape> shapes = display.shapes();
+        while(shapes.hasNext())
+        {
+            Shape temp = shapes.next();
+            if (temp instanceof Obstacle && ((Obstacle) temp).overlapsWith(ball))
+            {
+                if(((Obstacle) temp).handleCollision(ball))
+                    shapes.remove();
+                return true;
+            }
+            else if (temp instanceof Ball && ((Ball) temp).getY()>=100)
+            {
+                shapes.remove();
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Method: keyPressed()
+     * Usage: changes the paddle's sideways position
+     * ----------------------------
+     * only takes in LEFT & RIGHT ArrowKeys 
+     * and changes paddle's position accordingly
+     * @param e
+     */
+    public void keyPressed(KeyEvent e)
+    {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_LEFT)
+            paddle.moveLeft();
+        else if (key == KeyEvent.VK_RIGHT)
+            paddle.moveRight();
+    }
+    
+    /**
+     * Method: play()
+     * Usage: breakout.play()
+     * --------------------------
+     * runs an infinite loop
+     * in which the ball is updated every 25ms
+     */
+    public void play()
+    {
+        try { Thread.sleep(2000); }
+        catch(InterruptedException e) {}
+        
+        while (true)
+        {
+            try { Thread.sleep(20); }
+            catch(InterruptedException e) {}
+            
+            ball.move();
+            if (!checkForCollision())
+                newBall();
+            display.repaint();
+        }
+    }
+    
+    public static void main (String[] args)
+    {
+        Breakout breakout = new Breakout();
+        breakout.play();
+    }
+}

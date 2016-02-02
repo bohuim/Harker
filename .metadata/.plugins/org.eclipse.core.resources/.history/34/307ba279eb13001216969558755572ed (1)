@@ -1,0 +1,78 @@
+import java.util.ArrayList;
+
+//A MyBoundedGrid is a rectangular grid with a finite number of rows and columns.
+public class MyBoundedGrid<E>
+{
+	private Object[][] occupantArray;  // the array storing the grid elements
+	private int rows;
+	private int cols;
+
+	/**
+	 * Constructor: MyBoundedGrid()
+	 * Usage: MyBoundedGrid grid = new MyBoundedGrid(r, c);
+	 * -----------------------------------------------------
+	 * constructs a MyBoundedGrid by making a 2D Array of the given dimensions
+	 * @param rows- number of rows
+	 * @param cols - number of columns
+	 */
+	public MyBoundedGrid(int rows, int cols)
+	{
+		occupantArray = new Object[rows][cols];
+		this.rows = rows;
+		this.cols = cols;
+	}
+
+	//returns the number of rows
+	public int getNumRows()
+	{
+	    return rows;
+	}
+
+	//returns the number of columns
+	public int getNumCols()
+	{
+		return cols;
+	}
+
+	//returns true if loc is valid in this grid, false otherwise
+	//precondition:  loc is not null
+	public boolean isValid(Location loc)
+	{
+	    if (loc.getRow()<=rows && loc.getCol()<=cols)
+	        return true;
+		return false;
+	}
+
+	//returns the object at location loc (or null if the location is unoccupied)
+	//precondition:  loc is valid in this grid
+	public E get(Location loc)
+	{
+		return (E) occupantArray[loc.getRow()][loc.getCol()];
+
+		//(You will need to promise the return value is of type E.)
+	}
+
+	//puts obj at location loc in this grid and returns the object previously at that location (or null if the
+	//location is unoccupied)
+	//precondition:  loc is valid in this grid
+	public E put(Location loc, E obj)
+	{
+		Object oldObj = get(loc);
+		occupantArray[loc.getRow()][loc.getCol()] = obj;
+		return (E) oldObj;
+	}
+
+	//removes the object at location loc from this grid and returns the object that was removed (or null if the
+	//location is unoccupied
+	//precondition:  loc is valid in this grid
+	public E remove(Location loc)
+	{
+		throw new RuntimeException("INSERT MISSING CODE HERE");
+	}
+
+	//returns an array list of all occupied locations in this grid
+	public ArrayList<Location> getOccupiedLocations()
+	{
+		throw new RuntimeException("INSERT MISSING CODE HERE");
+	}
+}

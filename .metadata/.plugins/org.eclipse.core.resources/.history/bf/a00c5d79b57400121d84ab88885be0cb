@@ -1,0 +1,85 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: milk2
+*/
+public class milk2
+{
+    public static void main(String[] args) throws IOException
+    {
+//        BufferedReader f = new BufferedReader(new FileReader("milk2.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("milk2.out")));
+        
+        int n = 3;//Integer.parseInt(f.readLine());
+        milk2 m = new milk2();
+        Period[] list = new Period[n];
+        for (int i=0; i<n; i++)
+        {
+            StringTokenizer st = new StringTokenizer("300 1000\n700 1200\n1500 2100");
+            list[i] = m.createPeriod(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+        }
+        
+        ArrayList<Period> cont = new ArrayList<Period>();
+        cont.add(m.createPeriod(list[0].start, list[0].end));
+        Period current = cont.get(0);
+        for (int i=1; i<n; i++)
+        {
+            if (current.overlaps(list[i]))
+                current.changeEnd(list[i].end);
+            else
+            {
+                current = m.createPeriod(list[i].start, list[i].end);
+                cont.add(current);
+            }
+        }
+        int maxCont = cont.get(0).end - cont.get(0).start;
+        for (int i=1; i<n; i++)
+            if (cont.get(i).end - cont.get(i).start > maxCont)
+                maxCont = cont.get(i).end - cont.get(i).start;
+        
+        int maxEmpty = 0;
+        if (cont.size()>1)
+        {
+            for (int i=1; i<n; i++)
+                if (cont.get(i).start - cont.get(i-1).start > maxEmpty)
+                    maxEmpty  = cont.get(i).start - cont.get(i-1).start;
+        }
+        
+        System.out.print(maxCont + " ");
+        System.out.print(maxEmpty);
+        System.out.close();
+        System.exit(0);
+    }
+    
+    public Period createPeriod(int start, int end)
+    {
+        return new Period(start, end);
+    }
+    
+    class Period
+    {
+        private int start;
+        private int end;
+        
+        Period(int s, int e)
+        {
+            start = s;
+            end = e;
+        }
+        
+        public void changeEnd(int e)
+        {
+            end = e;
+        }
+        
+        public boolean overlaps(Period p)
+        {
+            if (p.end<start)
+                return true;
+            return false;
+        }
+    }
+}

@@ -1,0 +1,84 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.StringTokenizer;
+
+/**
+ * IteratorTester class created for testing MyHashSetIterator, but can test MyHashSet too. </br>
+ * Tester is user interactive through text typing in console. </br> </br>
+ * 
+ * <b>Commands</b>
+ * <ul>
+ *  <li>"contains value" calls {@code set.contains(value)}</li>
+ *  <li>"add value" calls {@code set.add(value)}</li>
+ *  <li>"remove value" calls {@code set.remove(value)}</li>
+ *  <li>"it" gets a new iterator with {@code. set.iterator()}</li>
+ *  <li>"hasNext" calls {@code it.hasNext()} if {@code it} is not null</li>
+ *  <li>"next" calls {@code it.next()} if {@code it} is not null</li>
+ *  <li>"itRemove" calls {@code it.remove()} if {@code it} is not null </li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 15, 2013
+ * 
+ * @Revision
+ *     Apr 15, 2013 - created and finished
+ */
+public class IteratorTester
+{
+    /**
+    * <b>Method: </b>main</br> 
+    * <b>Usage: </b>{@code }</br>
+    * -------------------------------</br>
+    * Has a BufferedReader that takes input from System.in through InputStreamReader. </br>
+    * A new set is created and an iterator is initially set as null. </br>
+    * For an undecided amount of times, input is split from " " using StringTokenizers and commands are executed accordingly. </br></br>
+    * ex) "add 100" adds 100 in ascending order to the set, "it" returns a new iterator
+    * 
+    * @param args - arguments to run a main thread
+    * @throws IOException when I/O causes problems
+    */
+   public static void main(String[] args) throws IOException
+   {
+       BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+       
+       MyHashSet<String> set = new MyHashSet<String>();
+       Iterator<String> it = null;
+       
+       while (true)
+       {
+           StringTokenizer token = new StringTokenizer(in.readLine());
+           String type = token.nextToken();
+           String value = "";
+           if (token.hasMoreTokens())
+               value = token.nextToken();
+           
+           if (type.equals("contains"))
+               System.out.println(set.contains(value));
+           else if (type.equals("add"))
+               set.add(value);
+           else if (type.equals("remove"))
+               set.remove(value);
+           else if (type.equals("it"))
+               it = set.iterator();
+           else if (type.equals("next"))
+           {
+               try { System.out.println(" " + it.next()); }
+               catch(NullPointerException e) { System.out.println("There's no iterator!"); }
+           }
+           else if (type.equals("hasNext"))
+           {
+               try { System.out.println(" " + it.hasNext()); }
+               catch(NullPointerException e) { System.out.println("There's no iterator!"); }
+           }
+           else if (type.equals("itRemove"))
+           {
+               try { it.remove(); }
+               catch(NullPointerException e) { System.out.println("There's no iterator!"); }
+           }
+           
+           System.out.println(set.toString());
+       }
+   }
+}

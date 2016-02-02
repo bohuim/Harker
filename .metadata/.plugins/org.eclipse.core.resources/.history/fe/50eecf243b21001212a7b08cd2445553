@@ -1,0 +1,109 @@
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+import javax.swing.*;
+
+/**
+ * Fancier display of the tetris game
+ * 
+ * @author Dennis
+ */
+public class Display implements KeyListener
+{
+    private JFrame frame;
+    private JPanel centerPanel;
+    private JPanel leftPanel;
+    private JPanel bottomLeftPanel;
+    private JPanel rightPanel;
+    private JLabel score;
+    
+    private JPanel gamePanel;
+    private MyBoundedGrid<Block> gameBoard;
+    private JPanel[][] gameGrid;
+    
+    private JPanel holdPanel;
+    private MyBoundedGrid<Block> holdBoard;
+    private JPanel[][] holdGrid;
+    
+    private JPanel nextMainPanel;
+    private JPanel otherNextPanel;
+    private MyBoundedGrid[] nextBoards;
+    private JPanel[][][] nextGrids;
+    
+    private JLabel level;
+    private JLabel linesCleard;
+    
+    /**
+     * Constructor: Display(tetrisBoard, holdBoard, nextBoardArray)
+     * Usage: Display display = new Display(tetrisBoard, holdBoard, nextBoardArray);
+     * -------------------------------------------------------------------------------
+     * @param gameB - main tetris game board
+     * @param holdB - board hold tetrad goes in
+     * @param nextB - board the next tetrads are stored in
+     */
+    public Display(MyBoundedGrid<Block> gameB, MyBoundedGrid<Block> holdB, MyBoundedGrid<Block>[] nextB)
+    {
+        gameBoard = gameB;
+        holdBoard = holdB;
+        nextBoards = nextB;
+        
+        gameGrid = new JPanel[gameBoard.getNumRows()][gameBoard.getNumCols()];
+        holdGrid = new JPanel[holdBoard.getNumRows()][holdBoard.getNumCols()];
+        for (int i=0; i<nextBoards.length; i++)
+            nextGrids = new JPanel[i][nextBoards[i].getNumRows()][nextBoards[i].getNumCols()];
+        
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                
+            }
+        });
+
+        //Wait until display has been drawn
+        try
+        {
+            while (frame == null || !frame.isVisible())
+                Thread.sleep(1);
+        }
+        catch(InterruptedException e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+    
+    private void createAndShowGUI()
+    {
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(395,438);
+        frame.setLayout(null);        
+        frame.addKeyListener(this);
+        frame.setFocusable(true);
+        
+        centerPanel = new JPanel();
+        centerPanel.setLocation()
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+}

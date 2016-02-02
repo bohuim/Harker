@@ -1,0 +1,288 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+/**
+ * 
+ * @author Dennis
+ */
+public class BlockDisplay implements KeyListener 
+{
+	private static final Color BACKGROUND = Color.BLACK;
+
+	private MyBoundedGrid<Block> board;
+	private JPanel[][] grid;
+	private JPanel mainPanel;
+	
+	private MyBoundedGrid<Block> holdBoard;
+	private JPanel[][] holdGrid;
+	private JPanel holdPanel;
+	
+	private MyBoundedGrid<Block>[] nextBoard;
+	private JPanel[][][] nextGrid;
+	private JPanel mainNextPanel;
+	private JPanel otherNextPanels;
+	private JPanel[] nextPanels;
+	
+	private JFrame frame;
+	private JLabel scoreLabel;
+	private ArrowListener listener;
+
+	// Constructs a new display for displaying the given board
+	public BlockDisplay(MyBoundedGrid<Block> board, MyBoundedGrid<Block> holdB, MyBoundedGrid<Block>[] nextB)
+	{
+		this.board = board;
+		grid = new JPanel[board.getNumRows()][board.getNumCols()];
+		
+		holdBoard = holdB;
+		holdGrid = new JPanel[holdBoard.getNumRows()][holdBoard.getNumCols()];
+		
+		nextBoard = nextB;
+	    nextGrid = new JPanel[nextBoard.length][holdBoard.getNumRows()][holdBoard.getNumCols()];
+
+        //Schedule a job for the event-dispatching thread:
+        //creating and showing this application's GUI.
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                createAndShowGUI();
+            }
+        });
+
+		//Wait until display has been drawn
+        try
+        {
+        	while (frame == null || !frame.isVisible())
+        		Thread.sleep(1);
+		}
+		catch(InterruptedException e)
+		{
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
+
+    /**
+     * Create the GUI and show it.  For thread safety,
+     * this method should be invoked from the
+     * event-dispatching thread.
+     */
+    private void createAndShowGUI()
+    {
+        //Create and set up the window.
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.addKeyListener(this);
+        frame.setFocusable(true);
+        frame.setSize(400,478);
+        frame.setLayout(null); //makes frame absolute control
+        
+        //main board
+        mainPanel = new JPanel();
+        mainPanel.setLayout(new GridLayout(board.getNumRows(), board.getNumCols()));
+        mainPanel.setLocation(95,40);
+        mainPanel.setSize(200,400);
+        mainPanel.setBorder(BorderFactory.createLineBorder(Color.RED));
+        for (int row = 0; row < grid.length; row++)
+        	for (int col = 0; col < grid[row].length; col++)
+        	{
+				grid[row][col] = new JPanel();
+				grid[row][col].setBackground(BACKGROUND);
+				grid[row][col].setPreferredSize(new Dimension(20, 20));
+				mainPanel.add(grid[row][col]);
+			}
+        frame.add(mainPanel);
+        
+        //hold board
+        holdPanel = new JPanel();
+        holdPanel.setLayout(new GridLayout(holdBoard.getNumRows(), holdBoard.getNumCols()));
+        holdPanel.setLocation(8,60);
+        holdPanel.setSize(20*holdBoard.getNumRows(),20*holdBoard.getNumCols());
+        holdPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+        for (int row = 0; row < holdGrid.length; row++)
+            for (int col = 0; col < holdGrid[row].length; col++)
+            {
+                holdGrid[row][col] = new JPanel();
+                holdGrid[row][col].setBackground(BACKGROUND);
+                holdGrid[row][col].setPreferredSize(new Dimension(20,20));
+                holdPanel.add(holdGrid[row][col]);
+            }
+        frame.add(holdPanel);
+        
+        //next board
+        mainNextPanel = new JPanel();
+        mainNextPanel.setLayout(new GridLayout(holdBoard.getNumRows(), holdBoard.getNumCols()));
+        mainNextPanel.setLocation(300,60);
+        mainNextPanel.setSize(80,80);
+        mainNextPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+        for (int row = 0; row < nextGrid[0].length; row++)
+            for (int col = 0; col < nextGrid[0][row].length; col++)
+            {
+                nextGrid[0][row][col] = new JPanel();
+                nextGrid[0][row][col].setBackground(BACKGROUND);
+                nextGrid[0][row][col].setPreferredSize(new Dimension(20,20));
+                mainNextPanel.add(nextGrid[0][row][col]);
+            }
+        frame.add(mainNextPanel);   
+        
+        otherNextPanels = new JPanel();
+        otherNextPanels.setBackground(Color.BLACK);
+        otherNextPanels.setSize(74,68*4+16);
+        otherNextPanels.setLocation(300,145);
+        nextPanels = new JPanel[5];
+        for (int i=1; i<nextGrid.length; i++)
+        {
+            nextPanels[i] = new JPanel();
+            nextPanels[i].setLayout(new GridLayout(holdBoard.getNumRows(), holdBoard.getNumCols()));
+            nextPanels[i].setSize(68,68);
+            nextPanels[i].setLocation(6,(i-1)*68);
+            for (int row = 0; row < nextGrid[i].length; row++)
+                for (int col = 0; col < nextGrid[i][row].length; col++)
+                {
+                    nextGrid[i][row][col] = new JPanel();
+                    nextGrid[i][row][col].setBackground(BACKGROUND);
+                    nextGrid[i][row][col].setPreferredSize(new Dimension(16,16));
+                    nextPanels[i].add(nextGrid[i][row][col]);
+                }
+            otherNextPanels.add(nextPanels[i]);
+        }
+        frame.add(otherNextPanels);
+        
+		//Show the board
+		showMain();
+
+        //Display the window.
+        frame.setVisible(true);
+    }
+
+	/**
+	 * Method: showMain()
+	 * Usage: BlockDisplay.showMain();
+	 * -------------------------------
+	 * repaints the main game board
+	 */
+	public void showMain()
+	{
+		for (int row = 0; row < grid.length; row++)
+			for (int col = 0; col < grid[row].length; col++)
+			{
+				Location loc = new Location(row, col);
+
+				Block square = board.get(loc);
+
+				if (square == null)
+				{
+					grid[row][col].setBackground(BACKGROUND);
+					grid[row][col].setBorder(null);
+				}
+				else
+				{
+					grid[row][col].setBackground(square.getColor());
+					grid[row][col].setBorder(BorderFactory.createLineBorder(Color.GRAY));
+				}
+			}
+		
+		
+	}
+	
+	/**
+     * Method: showHold()
+     * Usage: BlockDisplay.showHold();
+     * -------------------------------
+     * repaints the hold board
+     */
+	public void showHold()
+    {
+        for (int row = 0; row < holdGrid.length; row++)
+            for (int col = 0; col < holdGrid[row].length; col++)
+            {
+                Location loc = new Location(row, col);
+
+                Block square = holdBoard.get(loc);
+
+                if (square == null)
+                {
+                    holdGrid[row][col].setBackground(BACKGROUND);
+                    holdGrid[row][col].setBorder(null);
+                }
+                else
+                {
+                    holdGrid[row][col].setBackground(square.getColor());
+                    holdGrid[row][col].setBorder(BorderFactory.createLineBorder(Color.gray));
+                }
+            }      
+    }
+	
+	/**
+     * Method: showHold()
+     * Usage: BlockDisplay.showNext();
+     * -------------------------------
+     * repaints the next board
+     */
+	public void showNext()
+    {
+	    for (int i=0; i<nextGrid.length; i++)
+            for (int row = 0; row < nextGrid[i].length; row++)
+                for (int col = 0; col < nextGrid[i][row].length; col++)
+                {
+                    Location loc = new Location(row, col);
+    
+                    Block square = nextBoard[i].get(loc);
+    
+                    if (square == null)
+                    {
+                        nextGrid[i][row][col].setBackground(BACKGROUND);
+                        nextGrid[i][row][col].setBorder(null);
+                    }
+                    else
+                    {
+                        nextGrid[i][row][col].setBackground(square.getColor());
+                        nextGrid[i][row][col].setBorder(BorderFactory.createLineBorder(Color.gray));
+                    }
+                }      
+    }
+	
+	public void updateScore(int lvl)
+	{
+	    //scoreLabel.setText("Level: " + lvl);
+	}
+
+	// Sets the title of the window.
+	public void setTitle(String title)
+	{
+		frame.setTitle(title);
+	}
+
+	public void keyTyped(KeyEvent e)
+	{
+	}
+
+	public void keyReleased(KeyEvent e)
+	{
+	}
+
+	public void keyPressed(KeyEvent e)
+	{
+		if (listener == null)
+			return;
+		int code = e.getKeyCode();
+		if (code == KeyEvent.VK_LEFT)
+			listener.leftPressed();
+		else if (code == KeyEvent.VK_RIGHT)
+			listener.rightPressed();
+		else if (code == KeyEvent.VK_DOWN)
+			listener.downPressed();
+		else if (code == KeyEvent.VK_UP)
+			listener.upPressed();
+		else if (code == KeyEvent.VK_SPACE)
+		    listener.spacePressed();
+		else if (code == KeyEvent.VK_SHIFT)
+		    listener.shiftPressed();
+	}
+
+	public void setArrowListener(ArrowListener listener)
+	{
+		this.listener = listener;
+	}
+}

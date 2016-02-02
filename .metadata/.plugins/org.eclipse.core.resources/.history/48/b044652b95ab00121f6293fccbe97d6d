@@ -1,0 +1,24 @@
+/**
+ * 
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013
+ */
+public class Game
+{
+    
+    
+    public static void main(String[] args)
+    {
+        Board board = new Board();
+        BoardDisplay display = new BoardDisplay(board);
+    }
+}

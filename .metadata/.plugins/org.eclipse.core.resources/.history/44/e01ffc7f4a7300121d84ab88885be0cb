@@ -1,0 +1,13 @@
+package USACOTraining;
+
+/*
+ID: your_id_here
+LANG: JAVA
+TASK: test
+*/
+import java.io.*;
+import java.util.*;
+public class Ride
+{
+    
+}

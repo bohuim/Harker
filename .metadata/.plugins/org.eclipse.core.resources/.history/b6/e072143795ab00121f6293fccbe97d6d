@@ -1,0 +1,37 @@
+import java.awt.Color;
+
+/**
+ * 
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013
+ */
+public class Game
+{
+    
+    
+    public static void main(String[] args)
+    {
+        Board board = new Board();
+        
+        Piece blackKing = new King(Color.BLACK, direct("black_king"));
+        blackKing.putSelfInGrid(board, new Location(0, 4));
+        Piece whiteKing = new King(Color.WHITE, direct("white_king"));
+        whiteKing.putSelfInGrid(board, new Location(7, 4));
+        
+        BoardDisplay display = new BoardDisplay(board);
+    }
+    
+    private static String direct(String imgName)
+    {
+        return "C:/Google Drive/Programming/Java/Chess/images" + imgName + ".gif";
+    }
+}

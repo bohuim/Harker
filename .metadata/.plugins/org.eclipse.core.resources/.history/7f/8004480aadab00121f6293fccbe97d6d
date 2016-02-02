@@ -1,0 +1,47 @@
+import java.awt.Color;
+import java.util.Iterator;
+
+
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013
+ */
+public class King extends Piece
+{
+
+    /**<b>Constructor: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * 
+     * @param col
+     * @param fileName
+     * @param val
+     */
+    public King(Color col, String fileName)
+    {
+        super(col, fileName, 1000);
+        
+    }
+
+    /**<b>Method: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * 
+     * @return
+     */
+    @Override
+    public Iterator<Location> destinations()
+    {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+}

@@ -1,0 +1,49 @@
+
+/**
+ * List iterator for MyArrayList class.
+ * provides hasNext(), next(), remove(), set(E obj), add(E obj)
+ * @author Dennis Moon
+ *
+ * @param <E> - class type of the elements in the ArrayList
+ */
+public interface MyListIterator<E>
+{
+    /**
+     * Returns true if this list iterator has more elements when traversing the list in the forward direction
+     * @return boolean - whether next element exists
+     * 
+     */
+    boolean hasNext();
+    
+    /**
+     * Returns the next element in the list and advances the cursor position.
+     * 
+     * @return element nextIndex was pointing at
+     */
+    E next();
+    
+    /**
+     * Removes from the underlying collection the last element returned by this iterator (optional operation). 
+     * This method can be called only once per call to next().
+     * 
+     */
+    void remove();
+    
+    /**
+     * Replaces the last element returned by next or previous with the specified element (optional operation). 
+     * This call can be made only if neither remove nor add have been called after the last call to next or previous.
+     * 
+     * @param obj - object to replace last returned element
+     */
+    void set(E obj);
+    
+    /**
+     * Inserts the specified element into the list (optional operation). 
+     * The element is inserted immediately before the element that would be returned by next, if any, 
+     * and after the element that would be returned by previous, if any. 
+     * (If the list contains no elements, the new element becomes the sole element on the list.) 
+     * 
+     * @param obj - object to be inserted
+     */
+    void add(E obj);
+}

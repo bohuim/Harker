@@ -1,0 +1,90 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: beads
+*/
+public class beads
+{
+    static int index = 0;
+    static int size;
+    
+    public static void main(String[] args) throws IOException
+    {
+//        BufferedReader f = new BufferedReader(new FileReader("beads.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("beads.out")));
+        
+        String sample = "rwrwrwrwrwrwrwrwrwrwrwrw";
+        System.out.println(sample.length());
+        
+        int n = 77;//Integer.parseInt(f.readLine());
+        String str = (new StringTokenizer("rwrwrwrwrwrwrwrwrwrwrwrwbwrwbwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwrwr")).nextToken();
+        ArrayList<String> list = new ArrayList<String>();
+        for (int i=0; i<n; i++)
+            list.add(str.substring(i,i+1));
+        beads.setSize(n);
+        
+        int max = 0;
+        for (int i=0; i<n; i++)
+        {
+            int a = 0, b = 0;
+            beads.setIndex(i);
+            String first = list.get(i);
+            int next = i, start = i;
+            do
+            {
+                a++;
+                next = beads.nextIndex();
+            }
+            while (next!=start && (list.get(next).equals(first) || list.get(next).equals("w")));
+            if (next==start)
+                a=0;
+            
+            beads.setIndex(i);
+            int prev = beads.prevIndex();
+            start = prev;
+            String second = list.get(prev);
+            do
+            {
+                b++;
+                prev = beads.prevIndex();
+            }
+            while (prev!=start && (list.get(prev).equals(second) || list.get(prev).equals("w")));
+            
+            if (a+b>max)
+                max=a+b;
+        }
+        
+        System.out.println(max);
+        System.out.close();
+        System.exit(0);
+    }
+    
+    public static void setSize(int i)
+    {
+        size = i;
+    }
+    
+    public static void setIndex(int i)
+    {
+        index = i;
+    }
+    
+    public static int nextIndex()
+    {
+        index++;
+        if (index >= size)
+            index = 0;
+        return index;
+    }
+    
+    public static int prevIndex()
+    {
+        index--;
+        if (index <= -1)
+            index = size-1;
+        return index;
+    }
+}

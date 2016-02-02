@@ -1,0 +1,77 @@
+/**
+ * A equipment in our game. It can be placed in a room or given to a person and be equipped by a person.
+ * 
+ * @version 120917
+ *          Separated from the Thing class into a subclass of Thing
+ * 
+ * @author - Dennis Moon
+ */
+public class Equip extends Thing
+{
+    //types of equipment
+    public static final int WEAPON = 2;
+    public static final int ARMOR = 3;
+    
+    private int rating;
+    
+    private ThingOwner owner;
+
+    /**
+     * Constructor for equip items
+     * @param thingName - name of this thing
+     * @param aType - type of this thing, weapon or armor
+     * @param power - attack/defense of this equip item
+     */
+    public Equip(String thingName, int aType, int power)
+    {
+        super(thingName, aType);
+        
+        rating = power;
+    }
+    
+    /**
+     * returns the attack/defense of weapon/armor
+     * 
+     * @return rating of weapon/armor
+     */
+    public int getRating()
+    {
+        return rating;
+    }
+    
+    /**
+     * getOwner returns owner of this object
+     * 
+     * @return owner - the current owner of this object
+     */
+    public ThingOwner getOwner()
+    {
+        return owner;
+    }
+    
+    /**
+     * changeOwner removes the old owner and adds the new owner
+     * @param newOwner - new owner of the item
+     */
+    public void changeOwner(ThingOwner newOwner)
+    {
+        if (owner != null)
+            owner.remove(this);
+        newOwner.add(this);
+        owner = newOwner;
+    }
+    
+    /**
+     * equips this to the given person
+     * 
+     * @param aPerson - new equip owner of this item
+     */
+    public void equipTo(Person aPerson)
+    {
+        if (owner.equals(aPerson))
+            aPerson.equip(this);
+        else 
+            aPerson.say("I don't even own that item!");
+    }
+
+}

@@ -1,0 +1,107 @@
+import java.io.BufferedReader;
+import java.io.Console;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+
+/**
+ * 
+ * @author Dennis Moon
+ * @version Feb 8, 2013
+ * 
+ * Revision:
+ *     Feb 8, 2013
+ */
+public class Prelim2
+{
+    public static void main(String[] args)
+    {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        try
+        {
+            problemD(br);
+        } catch (IOException e){}
+    }
+    
+    public static void problemA(BufferedReader br) throws IOException
+    {
+        br.readLine();
+        System.out.println("It's Saturday. Hooray!");
+    }
+    
+    public static void problemB(BufferedReader br) throws IOException
+    {
+        String[] s = br.readLine().split(" ");
+        int[] n = new int[s.length];
+        String answer = "NO";
+        for (int i=0; i<s.length; i++)
+        {
+            n[i] = Integer.parseInt(s[i]);
+            if (i>0 && n[i-1]==4 && n[i]==2)
+                answer="YES";
+        }
+        System.out.println(answer);
+    }
+    
+    public static void problemC(BufferedReader br) throws IOException
+    {
+        int n = Integer.parseInt(br.readLine());
+        String ans = "YES";
+        for (int i=2; i*i<=n; i++)
+            if (n%i==0)
+                ans = "NO";
+        if (n==2)
+            ans = "YES";
+        System.out.println(ans);
+    }
+    
+    public static void problemD(BufferedReader br) throws IOException
+    {
+        String[] s = br.readLine().split(" ");
+        int a = Integer.parseInt(s[0]);
+        int b = Integer.parseInt(s[1]);
+        int c = Integer.parseInt(s[2]);
+        
+        if ((c%a)%b==0 || (c%b)%a==0)
+            System.out.println("YES");
+        else
+            System.out.println("NO");
+    }
+    
+    public static void problemE(BufferedReader br) throws IOException
+    {
+        String[] s = br.readLine().split(" ");
+        int x = Integer.parseInt(s[0]); 
+        int a = Integer.parseInt(s[1]);
+        int b = Integer.parseInt(s[2]);
+        int c = Integer.parseInt(s[3]);
+        
+        for (int i : combo(a,b,c))
+            if (i == x)
+                System.out.println("YES");
+    }
+    
+    private static int[] combo(int first, int second, int other)
+    {
+        int[] group = new int[6];
+        group[0] = first+second;
+        group[1] = first-second;
+        group[2] = second-first;
+        group[3] = first*second;
+        group[4] = first/second;
+        group[5] = second/first;
+        
+        int[] ans = new int[36];
+        for (int i=0; i<6; i++)
+        {
+            ans[6*i + 1] = group[i]+other;
+            ans[6*i + 2] = group[i]-other;
+            ans[6*i + 3] = other-group[i];
+            ans[6*i + 4] = group[i]*other;
+            ans[6*i + 5] = group[i]/other;
+            ans[6*i + 6] = other/group[i];
+        }
+        
+        return ans;
+    }
+}

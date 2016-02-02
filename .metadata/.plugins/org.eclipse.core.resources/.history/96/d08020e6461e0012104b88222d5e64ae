@@ -1,0 +1,480 @@
+import java.awt.Color;
+import java.util.concurrent.Semaphore;
+
+
+/**
+ * A piece class containing 4 blocks
+ * sends a command to all 4 blocks
+ * 
+ * @author Dennis Moon
+ */
+public class Tetrad
+{
+    private final int LONG = 0;
+    private final int SQUARE = 1;
+    private final int T = 2;
+    private final int L = 3;
+    private final int J = 4;
+    private final int S = 5;
+    private final int Z = 6;
+    
+    private MyBoundedGrid<Block> grid;
+    private MyBoundedGrid<Block> holdGrid;
+    private Block[] block;
+    private Block central;
+    private boolean isHeld;
+    private Semaphore lock;
+    
+    private int type;
+    private Block[] shadow;
+    
+    /**
+     * Constructor: Tetrad(grid)
+     * Usage: Tetrad active = new Tetrad(grid);
+     * -----------------------------------------
+     * creates block array, a semaphore and picks a random type and puts itself into the grid
+     * @param grid - for this tetrad to be inserted into
+     */
+    public Tetrad(MyBoundedGrid<Block> grid)
+    {
+        this.grid = grid;
+        block = new Block[4];
+        shadow = new Block[4];
+        for (int i=0; i<block.length; i++)
+        {
+            block[i] = new Block();
+            shadow[i] = new Block();
+        }
+        
+        type = (int)(Math.random()*7); 
+        setColor();
+        addToLocations(this.grid, setLocsInMain());
+        
+        isHeld = false;
+        lock = new Semaphore(1, true);
+    }
+    
+    /**
+     * Method: setColor()
+     * Usage: setColor();
+     * ---------------------------
+     * sets all blocks to the correct color depending on the type
+     * J is already blue, so no color change is given
+     */
+    private void setColor()
+    {
+        for (Block b : block)
+        {
+            if (type==LONG) b.setColor(Color.CYAN);
+            else if (type==SQUARE) b.setColor(Color.YELLOW);
+            else if (type==T) b.setColor(Color.MAGENTA);
+            else if (type==L) b.setColor(Color.ORANGE);
+            else if (type==S) b.setColor(Color.GREEN);
+            else if (type==Z) b.setColor(Color.RED);
+        }
+        for (Block s : shadow)
+            s.setColor(Color.BLACK);
+    }
+    
+    /**
+     * Method: setLocsInMain()
+     * Usage: setLocsInMain()
+     * --------------------------------
+     * sets the locations and color according to tetrad type
+     * @return newLoc - locations of the blocks to be inserted into
+     */
+    private Location[] setLocsInMain()
+    {
+        Location[] newLoc = new Location[4];
+        if (type == LONG) //Long tetrad
+        {
+            newLoc[0] = new Location(0,4);
+            newLoc[1] = new Location(1,4);
+            newLoc[2] = new Location(2,4);
+            newLoc[3] = new Location(3,4);
+            central = block[2];
+        }
+        else if (type == SQUARE) //square
+        {
+            newLoc[0] = new Location(0,4);
+            newLoc[1] = new Location(0,5);
+            newLoc[2] = new Location(1,4);
+            newLoc[3] = new Location(1,5);
+        }
+        else if (type == T) //T
+        {
+            newLoc[0] = new Location(0,4);
+            newLoc[1] = new Location(1,3);
+            newLoc[2] = new Location(1,4);
+            newLoc[3] = new Location(1,5); 
+            central = block[2];
+        }
+        else if (type == L) //L
+        {
+            newLoc[0] = new Location(0,4);
+            newLoc[1] = new Location(1,4);
+            newLoc[2] = new Location(2,4);
+            newLoc[3] = new Location(2,5); 
+            central = block[1];
+        }
+        else if (type == J) //J
+        {
+            newLoc[0] = new Location(0,5);
+            newLoc[1] = new Location(1,5);
+            newLoc[2] = new Location(2,5);
+            newLoc[3] = new Location(2,4); 
+            central = block[1];
+        }
+        else if (type == S) //S
+        {
+            newLoc[0] = new Location(0,5);
+            newLoc[1] = new Location(0,4);
+            newLoc[2] = new Location(1,4);
+            newLoc[3] = new Location(1,3); 
+            central = block[2];
+        }
+        else if (type == Z) //Z
+        {
+            newLoc[0] = new Location(0,4);
+            newLoc[1] = new Location(0,5);
+            newLoc[2] = new Location(1,5);
+            newLoc[3] = new Location(1,6); 
+            central = block[2];
+        }
+        return newLoc;
+    }
+    
+    /**
+     * Method: setLocsInHold()
+     * Usage: initializeInMain()
+     * --------------------------------
+     * sets the locations and color according to tetrad type
+     * @return newLoc - locations of the blocks to be inserted into
+     */
+    private Location[] setLocsInHold()
+    {        
+        Location[] newLoc = new Location[4];
+        if (type == LONG) //Long tetrad
+        {
+            newLoc[0] = new Location(1,0);
+            newLoc[1] = new Location(1,1);
+            newLoc[2] = new Location(1,2);
+            newLoc[3] = new Location(1,3);
+        }
+        else if (type == SQUARE) //square
+        {
+            newLoc[0] = new Location(1,1);
+            newLoc[1] = new Location(1,2);
+            newLoc[2] = new Location(2,1);
+            newLoc[3] = new Location(2,2);
+        }
+        else if (type == T) //T
+        {
+            newLoc[0] = new Location(1,1);
+            newLoc[1] = new Location(2,0);
+            newLoc[2] = new Location(2,1);
+            newLoc[3] = new Location(2,2); 
+            central = block[2];
+        }
+        else if (type == L) //L
+        {
+            newLoc[0] = new Location(1,1);
+            newLoc[1] = new Location(2,1);
+            newLoc[2] = new Location(3,1);
+            newLoc[3] = new Location(3,2); 
+        }
+        else if (type == J) //J
+        {
+            newLoc[0] = new Location(1,2);
+            newLoc[1] = new Location(2,2);
+            newLoc[2] = new Location(3,2);
+            newLoc[3] = new Location(3,1); 
+        }
+        else if (type == S) //S
+        {
+            newLoc[0] = new Location(1,2);
+            newLoc[1] = new Location(1,1);
+            newLoc[2] = new Location(2,1);
+            newLoc[3] = new Location(2,0); 
+        }
+        else if (type == Z) //Z
+        {
+            newLoc[0] = new Location(1,1);
+            newLoc[1] = new Location(1,2);
+            newLoc[2] = new Location(2,2);
+            newLoc[3] = new Location(2,3); 
+        }
+        return newLoc;
+    }
+    
+    /**
+     * Method: switchHold(holdGrid)
+     * Usage: swtichHold(holdGrid);
+     * ------------------------------
+     * switches this tetrad from active to hold or vise versa
+     * @param holdGrid - hold grid to be inserted into
+     */
+    public void switchHold(MyBoundedGrid<Block> holdGrid)
+    {
+        try
+        {
+            lock.acquire();
+            if (!isHeld)      
+            {
+                addToLocations(holdGrid,setLocsInHold());
+                isHeld = true;
+            }
+            else
+                addToLocations(grid, setLocsInMain());
+        }
+        catch (InterruptedException e){}
+        finally
+        {
+            lock.release();
+        }
+    }
+    
+    /**
+     * Method: addToLocations(grid, locs)
+     * Usage: addToLocations(board, locs)
+     * ------------------------------------
+     * @param grid - the blocks to be inserted into
+     * @param locs - location array of the blocks locations
+     */
+    private void addToLocations(MyBoundedGrid<Block> grid, Location[] locs)
+    {
+        for (int i=0; i<block.length; i++)
+            block[i].putSelfInGrid(grid, locs[i]);
+    }
+    
+    /**
+     * Method: removeBlocks()
+     * Usage: Location[] oldLocs = removeBlocks();
+     * ---------------------------------------------
+     * removes the blocks and returns their old locations
+     * @return oldLocs
+     */
+    public Location[] removeBlocks()
+    {
+        Location[] oldLocs = new Location[4];
+        for (int i=0; i<block.length; i++)
+        {
+            oldLocs[i] = block[i].getLocation();
+            block[i].removeSelfFromGrid();
+        }      
+        return oldLocs;
+    }
+    
+    /**
+     * Method: areEmpty(grid, locs)
+     * Usage: areEmpty(grid, newLocs)
+     * ------------------------------------
+     * @param gr - grid to check the validity of newLocs
+     * @param locs - new locations
+     * @return true if the new locations do not contain blocks already
+     */
+    private boolean areEmpty(MyBoundedGrid<Block> gr, Location[] locs)
+    {
+        Location[] temp = removeBlocks();     
+        int valid = 0;
+        for (Location l : locs)
+        {
+            if (gr.get(l)==null)
+                valid++;
+        }
+        
+        addToLocations(grid, temp);
+        
+        if (valid==4)
+            return true;
+        return false;
+    }
+    
+    /**
+     * Method: areValid(grid, locations)
+     * Usage: areValid(grid, newLocs)
+     * -----------------------------------
+     * @param gr - grid to check the validity of newLocs
+     * @param locs - new locations
+     * @return true if the new locations exist on the grid
+     */
+    private boolean areValid(MyBoundedGrid<Block> gr, Location[] locs)
+    {
+        Location[] temp = removeBlocks();        
+        int valid = 0;
+        for (Location l : locs)
+        {
+            if (gr.isValid(l))
+                valid++;
+        }
+        
+        addToLocations(grid, temp);
+        
+        if (valid==4)
+            return true;
+        return false;
+    }
+    
+    /**
+     * Method: translate()
+     * Usage: tetrad.translate(Location.SOUTH);
+     * -----------------------------------------------
+     * @param direction - direction provided by location class
+     * @return true if it succeeded
+     */
+    public boolean translate(int direction)
+    {
+        try
+        {
+            lock.acquire();
+            
+            Location[] newLocs = new Location[4];
+            for (int i=0; i<block.length; i++)
+                newLocs[i] = block[i].getLocation().getAdjacentLocation(direction);
+            
+            if (areValid(grid,newLocs) && areEmpty(grid, newLocs))
+            {
+                removeBlocks();
+                addToLocations(grid,newLocs);
+                return true;
+            }
+            return false;
+        }
+        catch (InterruptedException e)
+        {
+            // did not modify the tetrad
+            return false;
+        }
+        finally
+        {
+            lock.release();
+        }
+    }
+    
+    /**
+     * Method: rotate()
+     * Usage: rotate()
+     * -----------------------
+     * rotates this tetrad 90deg clockwise
+     * @return true - if it was rotated
+     */
+    public boolean rotate()
+    {
+        try
+        {
+            lock.acquire();
+            
+            if (type==SQUARE)
+                return false;
+            
+            Location[] newLocs = new Location[4];
+            Location[] oldLocs = new Location[4];
+            Location centralLoc = central.getLocation();
+            for (int i=0; i<oldLocs.length; i++)
+                oldLocs[i] = block[i].getLocation();
+            
+            for (int i=0; i<newLocs.length; i++)
+                newLocs[i] = new Location(centralLoc.getRow()-centralLoc.getCol()+oldLocs[i].getCol(),
+                                         centralLoc.getRow()+centralLoc.getCol()-oldLocs[i].getRow());
+
+            //if rotated locations are not on the grid, it is fixed
+            if (!areValid(grid, newLocs))
+                return fixRotation(grid, newLocs);
+            else if (areValid(grid, newLocs) && areEmpty(grid, newLocs))
+            {
+                removeBlocks();
+                addToLocations(grid, newLocs);
+                return true;
+            }
+            return false;            
+        }
+        catch (InterruptedException e)
+        {
+            // did not modify the tetrad
+            return false;
+        }
+        finally
+        {
+            lock.release();
+        }
+    }
+    
+    /**
+     * Method: fixRotation(grid, locs)
+     * Usage: fixRotation(grid, newLocs)
+     * ----------------------------------
+     * recursive method that takes in a location array 
+     * it goes through the array and if any location is not valid, it is shifted accordingly 
+     * and fixRoation is called again with the new location array (in case if 2 blocks go off the grid)
+     * then if the corrected locations are not already taken, the tetrad is rotated and shifted to the locations
+     * @param gr - grid this tetrad is to be fixed
+     * @param locs - locations to be fixed
+     * @return true if it was fixed
+     */
+    private boolean fixRotation(MyBoundedGrid<Block> gr, Location[] locs)
+    {
+        for (int n=0; n<locs.length; n++)
+        {
+            if (locs[n].getCol()<0)
+            {
+                for (int i=0; i<locs.length; i++)
+                    locs[i] = locs[i].getAdjacentLocation(Location.EAST);
+                fixRotation(grid, locs);
+            }
+            else if (locs[n].getCol()>9)
+            {
+                for (int i=0; i<locs.length; i++)
+                    locs[i] = locs[i].getAdjacentLocation(Location.WEST);
+                fixRotation(grid, locs);
+            }
+        }
+        
+        if (areEmpty(grid, locs))
+        {
+            removeBlocks();
+            addToLocations(grid, locs);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Method: updateShadow()
+     * Usage: active.updateShadow()
+     * -------------------------------
+     * gets the lowestest locations the shadow piece can go 
+     * and places it there
+     */
+    public void updateShadow()
+    {   
+        for (Block s : shadow)
+        {
+            if (s.getLocation()!=null)
+                s.removeSelfFromGrid();
+        }
+        
+        Location[] locs = new Location[4];
+        for (int i=0; i<block.length; i++)
+            locs[i] = block[i].getLocation();
+
+        while(areValid(grid,locs) && areEmpty(grid,locs))
+        {
+            for(int i=0; i<locs.length; i++)
+                locs[i] = locs[i].getAdjacentLocation(Location.SOUTH);
+        }
+        for(int i=0; i<locs.length; i++)
+            locs[i] = locs[i].getAdjacentLocation(Location.NORTH);
+  
+        
+        for (int i=0; i<shadow.length; i++)
+        {
+            for (Block b : block)
+            {
+                if (!grid.get(
+                        locs[i]).
+                        equals(b))
+                    shadow[i].putSelfInGrid(grid, locs[i]);
+            }
+        }
+    }
+}

@@ -1,0 +1,109 @@
+import java.awt.Color;
+import java.util.*;
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013 - class created & constructor and destinations() added
+ *     May 3, 2013 - castleCheck() method added
+ */
+public class King extends Piece
+{
+
+    /**<b>Constructor: </b>King</br> 
+     * <b>Usage: </b>{@code new King(color,fileName)}</br>
+     * -------------------------------</br>
+     * Creates a King by calling constructor of superclass Piece with given color, fileName, and value of 1000.
+     * 
+     * @param color - team of this King
+     * @param fileName - img directory of this King
+     */
+    public King(Color color, String fileName)
+    {
+        super(color, fileName, 1000);
+    }
+
+    /**<b>Method: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * A King can move one step in any direction of its current location. </br>
+     * All locations from [row-1, col-1] to  [row+1, col+1] are added to a Set and returned. </br>
+     * 
+     * @return set of all possible moves for a King
+     */
+    public Iterator<Location> destinations()
+    {
+        Set<Location> set = new TreeSet<Location>();
+        Location current = getLocation();
+        for (int dir=0; dir<360; dir+=45)
+            if(isValidDestination(current.getAdjacentLocation(dir)))
+                set.add(current.getAdjacentLocation(dir));
+        
+        checkCastle(set, Location.EAST);
+        checkCastle(set, Location.WEST);
+        return set.iterator();
+    }
+    
+    /**
+     * <b>Method: </b>checkCastle</br> 
+     * <b>Usage: </b>{@code checkCastle(set, Location.East)}</br>
+     * -------------------------------</br>
+     * Checks whether castling is available to the specified direction and adds the Rook's location if true. </br>
+     * Castling is only available when:
+     * <ul>
+     *  <li>King & Rook have not been moved</li>
+     * </ul>
+     * 
+     * @param set
+     * @param dir
+     * @return
+     */
+    private boolean checkCastle(Set<Location> set, int dir)
+    {
+        if (this.wasMoved()) return false;
+        
+        
+        
+        
+        Location target = getLocation().getAdjacentLocation(dir);
+        
+        int run = 2; //two steps to East for king of both color
+        if (dir == Location.WEST) // three for West
+            run = 3;
+        
+        for (int i=0; i<run; i++)
+        {
+            if (getBoard().get(target)!=null)
+                return false;
+            target = target.getAdjacentLocation(dir);
+        }
+        
+        Piece rook = getBoard().get(target);
+        if (rook instanceof Rook)
+        if (this.wasMoved() || rook.wasMoved()) return false;
+        
+        
+        if (getBoard().isValid(target) && getBoard().get(target) instanceof Rook)
+            set.add(target);
+        else
+            return false;
+        
+        return true;
+    }
+    
+    private Location getRookLoc(int dir)
+    {
+        int row = getLocation().getRow();
+        int col = 0;
+        if (dir == Location.EAST)
+            col = 7;
+        
+        return new Location(row, col);
+    }
+}

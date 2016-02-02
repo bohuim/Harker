@@ -1,0 +1,29 @@
+import java.io.IOException;
+
+
+/**
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version May 20, 2013
+ * 
+ * @Revision
+ *     May 20, 2013
+ */
+public class Main
+{
+    public static void main(String[] args) throws IOException
+    {
+        //ChessServer server = new ChessServer(1807);
+        //server.play();
+        
+        //ChessClient client = new ChessClient("127.0.0.1", 1807);
+        //client.play();
+        Game chess = new Game();
+        chess.play();
+    }
+}

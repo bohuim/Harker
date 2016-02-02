@@ -1,0 +1,17 @@
+/**
+ * 
+ * @author Dennis Moon
+ */
+public class Hanoi
+{
+    private Tower[] tower;
+    private Disc[] disc;
+    
+    public Hanoi()
+    {
+        tower = new Tower[3];
+        disc = new Disc[5];
+    }
+    
+    
+}

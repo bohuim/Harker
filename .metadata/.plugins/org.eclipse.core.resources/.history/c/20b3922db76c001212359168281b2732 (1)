@@ -1,0 +1,45 @@
+
+/**
+ * 
+ *
+ * @author Dennis
+ */
+public class PythagorasTree implements FractalGenerator
+{
+    private final double L = 0.25;
+    
+    public Curve step0()
+    {
+        FancyCurve square = new FancyCurve();
+        square.add(new Line(0.5+L/2, 0.5-L/2, 0, 0));
+        square.add(new Line(0.5-L/2, 0.5-L/2, 0, L));
+        square.add(new Line(0.5-L/2, 0.5+L/2, L, L));
+        square.add(new Line(0.5+L/2, 0.5+L/2, 0, L));
+        return square;
+    }
+    
+    public Curve transform(Curve previous)
+    {
+        double scaleVal = Math.sqrt(L*L/2)/L;
+        
+        FancyCurve[] lines = new FancyCurve[2];
+        lines[0] = (FancyCurve) previous.copy();
+        lines[0].translate(-(.5-L/2), 0);
+        lines[0].scale(scaleVal, scaleVal);
+        lines[1] = (FancyCurve) lines[0].copy();
+        
+        lines[0].rotate(45);
+        lines[0].translate(.5-L/2, L);
+        
+        lines[1].rotate(-45);
+        lines[1].translate(.5, L+L/2);
+        
+        //adds to new FancyCurve and returns
+        FancyCurve next = new FancyCurve();
+        for (FancyCurve l : lines)
+            next.add(l);
+        next.add(previous);
+        
+        return next;
+    }
+}

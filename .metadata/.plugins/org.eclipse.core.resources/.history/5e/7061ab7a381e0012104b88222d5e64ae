@@ -1,0 +1,39 @@
+import java.awt.Color;
+
+public class Shadow extends Tetrad
+{
+    private Block[] block;
+    private MyBoundedGrid<Block> grid;
+    
+    public Shadow(MyBoundedGrid<Block> grid)
+    {
+        super(grid);
+        this.grid = grid;
+        
+        block = new Block[4];
+        for (int i=0; i<block.length; i++)
+        {
+            block[i] = new Block();
+            block[i].setColor(Color.BLACK);
+        }
+    }
+    
+    public void update(Location[] realLocs)
+    {
+        while(!areEmpty(grid, realLocs))
+        {
+            for (int i=0; i<realLocs.length; i++)
+                realLocs[i] = realLocs[i].getAdjacentLocation(Location.SOUTH);
+        }
+        
+        while(areValid(grid, realLocs) && areEmpty(grid,realLocs))
+        {
+            for (int i=0; i<realLocs.length; i++)
+                realLocs[i] = realLocs[i].getAdjacentLocation(Location.SOUTH);
+        }
+        
+        if (block[0].getGrid()!=null)
+            removeBlocks();
+        addToLocations(grid,realLocs);
+    }
+}

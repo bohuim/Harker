@@ -1,0 +1,10 @@
+import java.util.*;
+
+public class Main 
+{	
+	public static void main (String [] args)
+	{
+	    Instrument piano = new Instrument("Piano");
+	    //KeyPress key = new KeyPress(piano);
+	}
+}

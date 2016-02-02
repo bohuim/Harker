@@ -1,0 +1,250 @@
+import java.util.Random;
+
+
+public class Hangman2 extends WordGame
+{
+    Random generator = new Random();
+    
+    //instance 
+    private String userInput;
+    private String history;
+    private int chancesLeft;
+    private String guessField;
+    private int wordIndex;
+    private int random;
+    private boolean letterAppears;
+    private String usedField;
+    
+    //constants
+    private static final String BASIC_HANGMAN_MESSAGE = "Guess a Letter or the Word" + "\n" + "Guessing a Word wrong will cost you 2 chances!" + "\n";
+    private static final String ALPHABET = "abcdefghijklmnopqrstuvwxyz";
+    
+    private static final String[] word = new String[20]; 
+    {
+        word[0] = "music";
+        word[1] = "television";
+        word[2] = "cello";
+        word[3] = "guitar";
+        word[4] = "pillow";
+        word[5] = "sofa";
+        word[6] = "stand";
+        word[7] = "bow";
+        word[8] = "laptop";
+        word[9] = "windows";
+        word[9] = "java";
+        word[10] = "computers";
+        word[11] = "science";
+        word[12] = "running";
+        word[13] = "comedy";
+        word[14] = "romance";
+        word[15] = "drawing";
+        word[16] = "soccer";
+        word[17] = "movie";
+        word[18] = "drama";
+        word[19] = "food";
+    }
+    private String[] wordLetters;
+    private String[] usedLetters;
+    
+    /** hangman sets the title as "Hangman"
+     * initializes all the variables needed
+     * @param none
+     * @return none
+     */
+    public void hangman()
+    {
+        setTitle("Hangman");
+        
+        resetHangman();
+        setText(history);
+        
+        while (continueGame())
+            guessWord();
+    }
+    /**resetHangman resets all values used in hangman
+     * @param
+     * @return
+     */
+    private void resetHangman()
+    {
+        chancesLeft = 10;
+        guessField = "";
+        wordIndex = 0;
+        userInput = "";
+        guessField = "";
+        usedField = "";
+        random = generator.nextInt(20);
+        
+        wordLetters = new String[word[random].length()];
+        usedLetters = new String [26];
+        
+        for (int i = 0; i < word[random].length(); i++)
+            wordLetters[i] = "_ ";
+        for (int i = 0; i < word[random].length(); i++)
+            guessField = guessField + wordLetters[i] + " ";
+        
+        for (int i = 0; i < ALPHABET.length(); i++)
+            usedLetters[i] = "";
+        for (int i = 0; i < ALPHABET.length(); i++)
+            usedField = usedField + usedLetters[i];
+        
+        history = BASIC_HANGMAN_MESSAGE 
+                + "\n"
+                + "Letters used: " + usedField + "\n"
+                + "Chances Left: " + chancesLeft + "\n"
+                + guessField;
+    }
+    
+    /**guessWord takes in the user's input
+     * and runs either checkLetter or checkString, then
+     * it sets the guessField and text accordingly
+     * @param none
+     * @return none
+     */
+    private void guessWord()
+    {
+        if (chancesLeft > 0 && !userInput.equals(word[random]))
+        {
+            userInput = getGuess();
+            guessField = "";
+            
+            if (userInput.length() == 1) checkLetter();
+            else checkString();
+            
+            
+        }
+    }
+    /** checkLetter compares the user input letter
+     * to the letters of the word and replaces "_ "
+     * with the letter if they match
+     * @param none
+     * @return none
+     */
+    private void checkLetter()
+    {
+        updateUsedLetters();
+        
+        letterAppears = false;
+        while (wordIndex < word[random].length())
+        {
+            if (userInput.equals(word[random].substring(wordIndex,wordIndex+1)))
+            {
+                wordLetters[wordIndex] = word[random].substring(wordIndex, wordIndex+1); 
+                letterAppears=true;
+            }
+            wordIndex++;
+        }
+        wordIndex = 0;
+        
+        for (int i = 0; i < word[random].length(); i++)
+            guessField = guessField + wordLetters[i] + " ";
+        
+        if (!(letterAppears==false)) //the input letter does appear
+        {
+            history = BASIC_HANGMAN_MESSAGE 
+                    + "Nice guess!" + "\n"
+                    + "Letters used: " + usedField + "\n"
+                    + "Chances left:" + chancesLeft + "\n"
+                    + guessField;
+            setText(history);  
+        }
+        else //input does not appear
+        {
+            chancesLeft --;
+            if (chancesLeft > 0)
+            {
+                history = BASIC_HANGMAN_MESSAGE 
+                        + "Oops!" + "\n"
+                        + "Letters used: " + usedField + "\n"
+                        + "Chances left:" + chancesLeft + "\n"
+                        + guessField;
+            }
+            else 
+            {
+                history = BASIC_HANGMAN_MESSAGE 
+                        + "GAME OVER! You ran out of chances" + "\n"
+                        + "Letters used: " + usedField + "\n"
+                        + "Chances left:" + chancesLeft + "\n"
+                        + guessField + "\n"
+                        + "Press Enter to play again";
+                setText(history);  
+                
+                getGuess(); //to pause the game
+                resetHangman();  
+            }
+            setText(history);  
+        }
+    }
+    /** checkString compares the user input string
+     * to the word and replaces the whole guessField
+     * with the letters of the word if they match.
+     * It also runs resetHangman to get a new word 
+     * for the next time the guessWord runs
+     * @param none
+     * @return none
+     */
+    private void checkString()
+    {
+        if (userInput.equals(word[random]))
+        {
+            for (int i = 0; i < word[random].length(); i++)
+                guessField = guessField + word[random].substring(i,i+1) + " ";
+            
+            history = BASIC_HANGMAN_MESSAGE 
+                    + "YAY Correct Word!" + "\n"
+                    + "Letters used: " + usedField + "\n"
+                    + "Chances left:" + chancesLeft + "\n"
+                    + guessField + "\n"
+                    + "Press Enter to play again";
+            setText(history);  
+            
+            getGuess(); //to pause the game
+            resetHangman();
+            setText(history);  
+        }
+        else
+        {
+            chancesLeft = chancesLeft - 2;
+            if (chancesLeft >= 0)
+            {
+                for (int i = 0; i < word[random].length(); i++)
+                    guessField = guessField + wordLetters[i] + " ";
+                
+                history = BASIC_HANGMAN_MESSAGE 
+                        + "That's not the Word!" + "\n"
+                        + "Letters used: " + usedField + "\n"
+                        + "Chances left:" + chancesLeft + "\n"
+                        + guessField;
+            }
+            else 
+            {
+                history = BASIC_HANGMAN_MESSAGE 
+                        + "GAME OVER! You ran out of chances" + "\n"
+                        + "Letters used: " + usedField + "\n"
+                        + "Chances left:" + chancesLeft + "\n"
+                        + guessField + "\n"
+                        + "Press Enter to play again";
+                setText(history);  
+                
+                getGuess(); //to pause the game
+                resetHangman();  
+            }
+            setText(history);  
+        }
+    }
+    private void updateUsedLetters()
+    {
+        usedField = "";
+        
+        while (wordIndex < ALPHABET.length())
+        {
+            if (userInput.equals(ALPHABET.substring(wordIndex,wordIndex+1)))
+                usedLetters[wordIndex] = ALPHABET.substring(wordIndex,wordIndex+1) + ", ";
+            wordIndex++;
+        }
+        wordIndex = 0;
+        
+        for (int i = 0; i < ALPHABET.length(); i++)
+            usedField = usedField + usedLetters[i];
+    }
+}

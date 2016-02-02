@@ -1,0 +1,199 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.ArrayList;
+/**
+ * LanderGUI manages the graphical user interface for the Lunar Lander
+ * @author Stuart Regis
+ *         Revised: Jan. 2007 Mr. Page
+ * @version 010407
+ */
+public class KeyBoard
+{
+    private JFrame frame;
+    private JLabel label;
+    
+    private Instrument piano;
+    private JPanel manual;
+    private ArrayList<JButton> manualKeys;
+    
+    /**
+     * Constructor for objects of class LanderGui
+     */
+    public KeyBoard(Instrument h)
+    {
+        piano = h;
+        // schedule a job for the event-dispatching thread to
+        // create and show this GUI
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                createAndShowGUI();
+            }
+        });
+        
+        // wait until the display has been drawn
+        try
+        {
+            while(frame == null || !frame.isVisible())
+                Thread.sleep(1);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+    // create and show this application's GUI
+    private void createAndShowGUI()
+    {
+        frame = new JFrame("Piano");
+        label = new JLabel();
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(20,20);
+        frame.setVisible(true);
+        frame.setFocusable(true);
+        
+        frame.add(label);
+        label.setLocation(20, 20);
+        label.setSize(20, 20);
+        
+        frame.addKeyListener(new KeyListener()
+        {
+            public void keyPressed(KeyEvent e)
+            {
+                char c = e.getKeyChar();
+                String str = Character.toString(c);
+                label.setText(piano.convertToNoteName(str));
+                Note myNote = piano.findNote(str);
+                if (myNote!=null)
+                    myNote.sustain();
+            }
+
+            public void keyReleased(KeyEvent e)
+            {
+                char c = e.getKeyChar();
+                String str = Character.toString(c);
+                Note myNote = piano.findNote(str);
+                myNote.silence();
+            }
+            
+            public void keyTyped(KeyEvent e){}
+        }
+        );
+
+        manualKeys = new ArrayList<JButton>();
+        manual = createManual(manualKeys);
+        //frame.add(manual, BorderLayout.SOUTH);
+    }
+    
+    private JButton findButton(String h)
+    {
+        JButton target = null;
+        for (JButton b:manualKeys)
+        {
+            if (b.getName().toLowerCase().equals(h))
+                target = b;
+        }
+
+        return target;
+    }
+
+    private JPanel createManual(ArrayList<JButton> keys)
+    {
+        JPanel buttons = new JPanel();
+        buttons.setLocation(15, 390);
+        buttons.setSize(1664, 380);
+
+        JButton C4 = new JButton("a");
+        C4.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            { 
+                piano.playNote("a");
+            }
+        });
+        buttons.add(C4);
+        C4.setLocation(0, 380);
+        C4.setSize(32, 128);
+        
+        keys.add(C4);
+        
+        /**
+        JButton D4 = new JButton("D");
+        C4.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                
+            	piano.playNote("d");
+            }
+        });
+        buttons.add(D4);
+        
+        JButton E4 = new JButton("E");
+        E4.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+            	piano.playNote("g");
+            }
+        });
+        buttons.add(E4);
+        
+        JButton F4 = new JButton("G");
+        F4.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                piano.playNote("g");
+            }
+        });
+        buttons.add(F4);
+        
+        JButton G4 = new JButton("G");
+        G4.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                piano.playNote("g");
+            }
+        });
+        buttons.add(G4);
+        
+        JButton A4 = new JButton("G");
+        A4.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                piano.playNote("g");
+            }
+        });
+        buttons.add(A4);
+        
+        JButton B4 = new JButton("G");
+        B4.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                piano.playNote("g");
+            }
+        });
+        buttons.add(B4);
+        
+        JButton C5 = new JButton("G");
+        C5.addActionListener(new ActionListener()
+        {
+            public void actionPerformed(ActionEvent e)
+            {
+                piano.playNote("g");
+            }
+        });
+        buttons.add(C5);
+        */
+        return buttons;
+
+    }
+}

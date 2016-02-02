@@ -1,0 +1,56 @@
+
+/**
+ * 
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version May 10, 2013
+ * 
+ * @Revision
+ *     May 10, 2013
+ */
+public class Castle extends Move
+{
+    private Move kingMove;
+    private Move rookMove;
+
+    /**<b>Constructor: </b></br> 
+     * <b>Usage: </b>{@code }</br>
+     * -------------------------------</br>
+     * 
+     * @param piece
+     * @param destination
+     */
+    public Castle(Piece king, Piece rook)
+    {
+        super(king, king.getLocation().getAdjacentLocation(Location.EAST)); //super constructor needs to be called
+        
+        int dir = king.getLocation().getDirectionToward(rook.getLocation());
+        System.out.println(dir);
+        int row = king.getLocation().getRow(), kingCol = 1, rookCol = 2;
+        if (dir == Location.EAST)
+        {
+            kingCol = 6;
+            rookCol = 5;
+        }
+        
+        kingMove = new Move(king, new Location(row, kingCol));
+        rookMove = new Move(rook, new Location(row, rookCol));
+    }
+
+    public void execute()
+    {
+        rookMove.execute();
+        kingMove.execute();
+    }
+    
+    public void undo()
+    {
+        kingMove.undo();
+        rookMove.undo();
+    }
+}

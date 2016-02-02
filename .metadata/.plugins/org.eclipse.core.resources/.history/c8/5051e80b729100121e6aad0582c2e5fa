@@ -1,0 +1,22 @@
+import java.util.ArrayList;
+
+
+/**
+ * 
+ * @author Dennis Moon
+ * @version Mar 19, 2013
+ * 
+ * @Revision:
+ *     Mar 19, 2013
+ */
+public class TreeTester
+{
+    public static void main(String[] args)
+    {
+        TreeDisplay display = new TreeDisplay();
+        
+        TreeNode root = TreeUtil.createRandom(5);
+        display.displayTree(root);
+        TreeUtil.postOrder(root, display);
+    }
+}

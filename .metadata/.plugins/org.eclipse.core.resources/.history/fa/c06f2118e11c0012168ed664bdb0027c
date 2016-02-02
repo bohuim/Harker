@@ -1,0 +1,308 @@
+import java.awt.Color;
+import java.util.ArrayList;
+
+/**
+ * A group of 4 blocks
+ * Controls all 4 blocks at once, but if an action cannot be applied to all 4,
+ * it should not be executed
+ * 
+ * @version
+ * @author Dennis Moon
+ */
+public class Piece
+{
+    public static final int LONG = 0;
+    public static final int SQUARE = 1;
+    public static final int T = 2;
+    public static final int L = 3;
+    public static final int J = 4;
+    public static final int S = 5;
+    public static final int Z = 6;
+    
+    private Block[] blocks = new Block[4];
+    private int type;
+    private MyBoundedGrid<Block> grid;
+    private Location[] locations;
+    private int rotated;
+    private int status;
+    
+    public Piece()
+    {
+        for (int i=0; i<blocks.length; i++)
+            blocks[i] = new Block();
+        locations = new Location[4];
+        type = (int)(Math.random()*7);
+        status = Block.MOVING;
+        rotated = 0;
+        setColor();
+    }
+    
+    /**
+     * Method: getLocaiton()
+     * Usage: Location[] loc = piece.getLocation();
+     * ---------------------------------------------
+     * returns an arraylist of locations of the blocks that will be affected going in the given direction
+     * @param direction - from location class
+     * @return arraylist of locations in this piece
+     */
+    public Location[] getLocations()
+    {
+        return locations;
+    }
+    
+    /**
+     * Method: updateLocaitons()
+     * Usage: updateLocation();
+     * --------------------------------
+     * updates the locations array of the blocks
+     */
+    private void updateLocations()
+    {
+        for(int i=0; i<locations.length; i++)
+            locations[i] = blocks[i].getLocation();
+    }
+    
+    /**
+     * Method: move(int direction)
+     * Usage: piece.move(Location.DIRECTION);
+     * ------------------------------------------
+     * moves all the blocks according to given direction
+     * @param direction - from Location class
+     */
+    public void move(int direction)
+    {
+        for (int i=0; i<locations.length; i++)
+            locations[i] = locations[i].getAdjacentLocation(direction);
+        for (Block b : blocks)
+            b.removeSelfFromGrid();
+        for (int i=0; i<blocks.length; i++)
+            blocks[i].putSelfInGrid(grid, locations[i]);
+    }
+    
+    /**
+     * Method: moveValid(int direction)
+     * Usage: piece.moveValid(Locaiton.DIRECTION)
+     * ------------------------------------------
+     * checks if the move towards the given direction is valid
+     * by first seeing that the new locations exist
+     * and that the new locations are not already occupied or is part of this piece
+     * @param direction - the piece is going to move in
+     * @return true - if all blocks of this piece can move in that direction
+     */
+    public boolean moveValid(int direction)
+    {
+        int valid = 0;
+        
+        for (int i=0; i<locations.length; i++)
+        {
+            Location newLoc = locations[i].getAdjacentLocation(direction);
+            if (grid.isValid(newLoc))
+            {
+                if(grid.get(newLoc)==null || grid.get(newLoc).getStatus()==Block.MOVING)
+                    valid++;
+            }
+        }
+        
+        if (valid==4)
+            return true;
+        return false;
+    }
+    
+    /**
+     * Method: rotate()
+     * Usage: piece.rotate();
+     * ------------------------------
+     * rotates the block according to each type of piece and rotated number
+     * and increments rotated
+     */
+    public void rotate()
+    {
+        if(type==LONG)
+        {
+            locations[0] = locations[0].getAdjacentLocation(Location.SOUTHEAST + (rotated*90)).getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+            locations[1] = locations[1].getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+            locations[2] = locations[2].getAdjacentLocation(Location.NORTHWEST + (rotated*90));
+        }
+        else if (type==T)
+        {
+            locations[0] = locations[0].getAdjacentLocation(Location.SOUTHWEST + (rotated*90));
+            locations[1] = locations[1].getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+            locations[2] = locations[2].getAdjacentLocation(Location.NORTHEAST + (rotated*90));
+        }
+        else if(type==L)
+        {
+            locations[0] = locations[0].getAdjacentLocation(Location.SOUTHWEST + (rotated*90));
+            locations[1] = locations[1].getAdjacentLocation(Location.SOUTHEAST + (rotated*90)).getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+            locations[2] = locations[2].getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+        }
+        else if(type==J)
+        {
+            locations[0] = locations[0].getAdjacentLocation(Location.SOUTHEAST + (rotated*90)).getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+            locations[1] = locations[1].getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+            locations[2] = locations[2].getAdjacentLocation(Location.NORTHEAST + (rotated*90));
+        }
+        else if(type==S)
+        {
+            locations[0] = locations[0].getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+            locations[1] = locations[1].getAdjacentLocation(Location.SOUTHEAST + (rotated*90)).getAdjacentLocation(Location.SOUTHWEST + (rotated*90));
+            locations[2] = locations[2].getAdjacentLocation(Location.NORTHEAST + (rotated*90));
+        }
+        else if(type==Z)
+        {
+            locations[0] = locations[0].getAdjacentLocation(Location.SOUTHWEST + (rotated*90));
+            locations[1] = locations[1].getAdjacentLocation(Location.NORTHEAST + (rotated*90)).getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+            locations[2] = locations[2].getAdjacentLocation(Location.SOUTHEAST + (rotated*90));
+        }
+        
+        fixRotation(rotationLocationNotValid(locations));
+        for (int i=0; i<locations.length; i++)
+            blocks[i].moveTo(locations[i]);
+        rotated++;
+        updateLocations();
+    }
+    
+    private int rotationLocationNotValid(Location[] tempLocs)
+    {
+        for (int i=0; i<tempLocs.length; i++)
+        {
+            if (tempLocs[i].getRow()<0)
+                return i;
+            else if (tempLocs[i].getCol()<0)
+                return i;
+            else if (tempLocs[i].getCol()>=grid.getNumCols())
+                return i;
+        }
+        return 3;
+    }
+    
+    private void fixRotation(int index)
+    {
+        for (int i=0; i<locations.length; i++)
+        {
+            if (locations[index].getRow()<0)
+                locations[i] = locations[i].getAdjacentLocation(Location.SOUTH);
+            else if (locations[index].getCol()<0)
+                locations[i] = locations[i].getAdjacentLocation(Location.EAST);
+            else if (locations[index].getCol()<0)
+                locations[i] = locations[i].getAdjacentLocation(Location.WEST);
+        }
+    }
+    
+    /**
+     * Method: settle()
+     * Usage: piece.settle();
+     * ----------------------------
+     * changes all the statuses of blocks in this piece to fixed
+     */
+    public void settle()
+    {
+        for (Block b : blocks)
+            b.setStatus(Block.FIXED);
+        status = Block.FIXED;
+    }
+    
+    /**
+     * Method: settled()
+     * Usage: boolean isSettled = piece.settled();
+     * --------------------------------------------
+     * @return boolean - whether this piece can be moved or not
+     */
+    public boolean settled()
+    {
+        if (status==Block.FIXED)
+            return true;
+        return false;
+    }
+    
+    /**
+     * Method: setColor()
+     * Usage: setColor();
+     * -----------------------------
+     * Only to be called by constructor
+     * sets the color according to piece type
+     */
+    private void setColor()
+    {
+        for (Block b : blocks)
+        {
+            if (type==LONG) b.setColor(Color.CYAN);
+            else if (type==SQUARE) b.setColor(Color.YELLOW);
+            else if (type==T) b.setColor(Color.MAGENTA);
+            else if (type==L) b.setColor(Color.ORANGE);
+            else if (type==S) b.setColor(Color.GREEN);
+            else if (type==Z) b.setColor(Color.RED);
+        }
+    }
+    
+    public void removeSelfFromGrid()
+    {
+        for (int i=0; i<blocks.length; i++)
+            blocks[i].removeSelfFromGrid();
+    }
+    
+    /**
+     * Method: putSelfInGrid(grid, location)
+     * Usage: piece.putSelfInGrid(grid, new Location(r,c));
+     * --------------------------------------------------------
+     * Puts the first block into the given location, and all other blocks according to piece type
+     * The 4th block (index 3) is set as the center of rotation
+     * @param gr - grid to be inserted into
+     * @param loc - location to be inserted into
+     */
+    public void putSelfInGrid(MyBoundedGrid<Block> gr, Location loc)
+    {
+        grid = gr;
+        
+        if (type==LONG)
+        {
+            blocks[0].putSelfInGrid(grid, loc);
+            blocks[1].putSelfInGrid(grid, loc.getAdjacentLocation(Location.SOUTH));
+            blocks[3].putSelfInGrid(grid, blocks[1].getLocation().getAdjacentLocation(Location.SOUTH));
+            blocks[2].putSelfInGrid(grid, blocks[3].getLocation().getAdjacentLocation(Location.SOUTH));
+        }
+        else if (type==SQUARE)
+        {
+            blocks[0].putSelfInGrid(grid, loc);
+            blocks[1].putSelfInGrid(grid, blocks[0].getLocation().getAdjacentLocation(Location.EAST));
+            blocks[2].putSelfInGrid(grid, blocks[0].getLocation().getAdjacentLocation(Location.SOUTH));
+            blocks[3].putSelfInGrid(grid, blocks[0].getLocation().getAdjacentLocation(Location.SOUTHEAST));
+        }
+        else if (type==T)
+        {
+            blocks[0].putSelfInGrid(grid, loc.getAdjacentLocation(Location.SOUTHEAST));
+            blocks[1].putSelfInGrid(grid, loc);
+            blocks[2].putSelfInGrid(grid, loc.getAdjacentLocation(Location.SOUTHWEST));
+            blocks[3].putSelfInGrid(grid, loc.getAdjacentLocation(Location.SOUTH));
+        }
+        else if (type==L)
+        {
+            blocks[1].putSelfInGrid(grid, loc);
+            blocks[2].putSelfInGrid(grid, blocks[1].getLocation().getAdjacentLocation(Location.SOUTH));
+            blocks[3].putSelfInGrid(grid, blocks[2].getLocation().getAdjacentLocation(Location.SOUTH));
+            blocks[0].putSelfInGrid(grid, blocks[2].getLocation().getAdjacentLocation(Location.SOUTHEAST));
+        }
+        else if (type==J)
+        {
+            blocks[0].putSelfInGrid(grid, loc);
+            blocks[1].putSelfInGrid(grid, blocks[0].getLocation().getAdjacentLocation(Location.SOUTH));
+            blocks[2].putSelfInGrid(grid, blocks[1].getLocation().getAdjacentLocation(Location.SOUTHWEST));
+            blocks[3].putSelfInGrid(grid, blocks[1].getLocation().getAdjacentLocation(Location.SOUTH));
+        }
+        else if (type==S)
+        {
+            blocks[0].putSelfInGrid(grid, loc);
+            blocks[1].putSelfInGrid(grid, loc.getAdjacentLocation(Location.EAST));
+            blocks[2].putSelfInGrid(grid, loc.getAdjacentLocation(Location.SOUTHWEST));
+            blocks[3].putSelfInGrid(grid, loc.getAdjacentLocation(Location.SOUTH));
+        }
+        else if (type==Z)
+        {
+            blocks[0].putSelfInGrid(grid, loc.getAdjacentLocation(Location.SOUTHEAST));
+            blocks[1].putSelfInGrid(grid, loc.getAdjacentLocation(Location.WEST));
+            blocks[2].putSelfInGrid(grid, loc);
+            blocks[3].putSelfInGrid(grid, loc.getAdjacentLocation(Location.SOUTH));
+        }
+        
+        updateLocations();
+    }
+}

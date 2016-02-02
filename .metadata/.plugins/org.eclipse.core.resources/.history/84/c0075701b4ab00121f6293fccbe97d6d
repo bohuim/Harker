@@ -1,0 +1,47 @@
+import java.awt.Color;
+import java.util.*;
+/**
+ * 
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li></li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013
+ */
+public class Game
+{
+    
+    
+    public static void main(String[] args)
+    {
+        Board board = new Board();
+        
+        //King
+        Piece blackKing = (Piece) new King(Color.BLACK, directory("black_king"));
+        blackKing.putSelfInGrid(board, new Location(0, 4));
+        Piece whiteKing = (Piece) new King(Color.WHITE, directory("white_king"));
+        whiteKing.putSelfInGrid(board, new Location(7, 4));
+        //Rook
+        Piece blackRook1 = (Piece) new Rook(Color.BLACK, directory("black_rook"));
+        blackRook1.putSelfInGrid(board, new Location(0, 0));
+        Piece blackRook2 = (Piece) new Rook(Color.BLACK, directory("black_rook"));
+        blackRook2.putSelfInGrid(board, new Location(0, 7));
+        Piece whiteRook1 = (Piece) new Rook(Color.WHITE, directory("white_rook"));
+        whiteRook1.putSelfInGrid(board, new Location(7, 0));
+        Piece whiteRook2 = (Piece) new Rook(Color.WHITE, directory("white_rook"));
+        whiteRook2.putSelfInGrid(board, new Location(7, 7));
+        
+        BoardDisplay display = new BoardDisplay(board);
+    }
+    
+    private static String directory(String imgName)
+    {
+        return "C:/Google Drive/Programming/Java/Chess/images/" + imgName + ".gif";
+    }
+}

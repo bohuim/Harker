@@ -1,0 +1,72 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: crossings
+*/
+public class crossings
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out, true);
+        
+//        BufferedReader f = new BufferedReader(new FileReader("relay.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("relay.out")));
+        
+        int n = Integer.parseInt(f.readLine());
+        crossings[] cow = new crossings[n];
+        for (int i=0; i<n; i++)
+        {
+            StringTokenizer st = new StringTokenizer(f.readLine());
+            cow[i] = new crossings(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
+        }
+        
+        for (int i=0; i<n; i++)
+        {
+            int target = 1;
+            while (target<n && cow[i].safe)
+            {
+                if (!cow[i].safeFrom(cow[target]))
+                {
+                    cow[i].safe = false;
+                    cow[target].safe = false;
+                }
+                target++;
+            }
+            if (target==n)
+                cow[i].safe = true;
+        }
+        
+        int count = 0;
+        for (int i=0; i<n; i++)
+            if (cow[i].safe)
+                count++;
+        
+        out.println(count);
+        out.close();
+        System.exit(0);
+    }
+    
+    int a;
+    int b;
+    boolean safe;
+    
+    public crossings(int a, int b)
+    {
+        this.a = a;
+        this.b = b;
+        safe = true;
+    }
+    
+    public boolean safeFrom(crossings target)
+    {
+        if ((a<target.a) && (target.b<b))
+            return false;
+        if ((a<target.a && b<target.b) || (target.a<a && target.b<b))
+            return true;
+        return true;
+    }
+}

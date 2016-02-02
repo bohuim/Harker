@@ -1,0 +1,119 @@
+import java.awt.Color;
+
+public class Shadow
+{
+    private Block[] block;
+    private MyBoundedGrid<Block> grid;
+    
+    public Shadow(MyBoundedGrid<Block> gr)
+    {
+        grid = gr;
+        
+        block = new Block[4];
+        for (int i=0; i<block.length; i++)
+        {
+            block[i] = new Block();
+            block[i].setColor(Color.BLACK);
+        }
+    }
+    
+    public void update(Location[] realLocs)
+    {
+        while(!areEmpty(realLocs))
+        {
+            for (int i=0; i<realLocs.length; i++)
+                realLocs[i] = realLocs[i].getAdjacentLocation(Location.SOUTH);
+        }
+        
+        while(areValid(realLocs) && areEmpty(realLocs))
+        {
+            for(int i=0; i<realLocs.length; i++)
+                realLocs[i] = realLocs[i].getAdjacentLocation(Location.SOUTH);
+        }
+        
+        if (block[0].getGrid()!=null)
+            removeBlocks();
+        addToLocations(realLocs);
+    }
+    
+    /**
+     * Method: areEmpty(grid, locs)
+     * Usage: areEmpty(grid, newLocs)
+     * ------------------------------------
+     * @param gr - grid to check the validity of newLocs
+     * @param locs - new locations
+     * @return true if the new locations do not contain blocks already
+     */
+    private boolean areEmpty(MyBoundedGrid<Block> gr, Location[] locs)
+    {
+        Location[] temp = removeBlocks();     
+        int valid = 0;
+        for (Location l : locs)
+        {
+            if (gr.get(l)==null)
+                valid++;
+        }
+        
+        addToLocations(grid, temp);
+        
+        if (valid==4)
+            return true;
+        return false;
+    }
+    
+    /**
+     * Method: areValid(grid, locations)
+     * Usage: areValid(grid, newLocs)
+     * -----------------------------------
+     * @param gr - grid to check the validity of newLocs
+     * @param locs - new locations
+     * @return true if the new locations exist on the grid
+     */
+    private boolean areValid(MyBoundedGrid<Block> gr, Location[] locs)
+    {
+        Location[] temp = removeBlocks();        
+        int valid = 0;
+        for (Location l : locs)
+        {
+            if (gr.isValid(l))
+                valid++;
+        }
+        
+        addToLocations(grid, temp);
+        
+        if (valid==4)
+            return true;
+        return false;
+    }
+    
+    /**
+     * Method: removeBlocks()
+     * Usage: Location[] oldLocs = removeBlocks();
+     * ---------------------------------------------
+     * removes the blocks and returns their old locations
+     * @return oldLocs
+     */
+    public Location[] removeBlocks()
+    {
+        Location[] oldLocs = new Location[4];
+        for (int i=0; i<block.length; i++)
+        {
+            oldLocs[i] = block[i].getLocation();
+            block[i].removeSelfFromGrid();
+        }      
+        return oldLocs;
+    }
+    
+    /**
+     * Method: addToLocations(grid, locs)
+     * Usage: addToLocations(board, locs)
+     * ------------------------------------
+     * @param grid - the blocks to be inserted into
+     * @param locs - location array of the blocks locations
+     */
+    private void addToLocations(MyBoundedGrid<Block> grid, Location[] locs)
+    {
+        for (int i=0; i<block.length; i++)
+            block[i].putSelfInGrid(grid, locs[i]);
+    }
+}

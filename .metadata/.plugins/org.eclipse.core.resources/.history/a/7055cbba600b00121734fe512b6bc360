@@ -1,0 +1,93 @@
+/**
+ * Write a description of class GuitarString here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+public class Note 
+{
+    public static final int A = 0;
+    public static final int Bb = 1;
+    public static final int B = 2;
+    public static final int C = 3;
+    public static final int Cs = 4;
+    public static final int D = 5;
+    public static final int Ds = 6;
+    public static final int E = 7;
+    public static final int F = 8;
+    public static final int Fs = 9;
+    public static final int G = 10;
+    public static final int Gs = 11;
+    
+    private RingBuffer buffer;    
+    
+    private double frequency;
+    private int capacity;
+    private int ticCount;
+    
+    public double ticSum;
+    
+    private static final int SAMPLE_RATE = 44100;
+    private final double ENERGY_DECAY = .996;
+
+    /**create a quitar string of the given frequency and level
+     */
+    public Note(int noteName, int lvl) 
+    {
+    	frequency = (55 * Math.pow(2, noteName/12.0)) * Math.pow(2,lvl-1);
+        capacity = (int) (SAMPLE_RATE/frequency + 0.5);
+        buffer = new RingBuffer(capacity);
+        
+        ticCount = 0;
+    }
+    
+    /** set the buffer to white noise
+     */
+    public void pluck() 
+    {
+        if (time()<100)
+        {
+            for (int i = 0; i < capacity; i++)
+                buffer.enqueue (Math.random() - 0.5);
+            ticCount=0;
+        }
+    }
+    
+    /** set the buffer to zeros
+     */
+    public void silence()
+    {
+    	for (int i = 0; i < capacity; i++)
+            buffer.enqueue (0);
+    	ticCount = 0;
+    }
+    
+    /** advance the simulation one time step
+     */
+    public void tic() 
+    {
+        buffer.enqueue(ENERGY_DECAY*(buffer.dequeue() + buffer.peek())/2);
+        ticCount++;
+    }
+    
+    /** return the current sample
+     */
+    public double sample() 
+    {
+        return buffer.peek();
+    }
+    
+    /** return number of tics
+     */
+    public int time()
+    {
+        return ticCount;
+    }
+    
+    /** return if this string is plucked or not
+     */
+    public boolean isEmpty()
+    {
+    	return buffer.isEmpty();
+    }
+}

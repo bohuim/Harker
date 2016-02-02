@@ -1,0 +1,666 @@
+/**
+ * A person or character in our game.  There will be at least three kinds of people:
+ * a hero (you), monsters (who eat other people), and robots (who walk around and do their own thing).
+ * 
+ * @version 120914
+ *          edited and updated to Part 1
+ * @version 120914
+ *          Part 2 started, can equip weapon/armor, attack other people
+ * @version 120916
+ *          person can check his own status
+ * @version 120920
+ *          can consume potions to gain health
+ *
+ * @edited Part 1 - Andrew Luo, Dennis Moon
+ * @author Part 2 - Dennis
+ */
+import java.util.*;
+
+import javax.swing.text.html.HTMLEditorKit.Parser;
+public class Person implements ThingOwner
+{
+    //types of people
+    public static final int HERO     = 0;
+
+    public static final int ROBOT    = 1;
+    public static final int KNIGHT   = 2;
+    public static final int MAGICIAN = 3;
+    public static final int SOLDIER  = 4;
+    public static final int ELF      = 5;
+    
+    public static final int MONSTER = 6;
+    public static final int SLIME   = 7;
+    public static final int GOLEM   = 8;
+    public static final int GHOST   = 9;
+    public static final int BOSS    = 10;
+    
+    //instance variables
+    private String name;
+    private int type;
+    private Room room;
+    
+    private int maxHealth;
+    private int health;
+    private int level;
+    private int lives;
+    private Equip weapon;
+    private Equip armor;
+    private int attack;
+    private int defense;
+    
+    private ArrayList<Thing> items;
+
+    //creates a new person with given name and of given type
+    public Person(String victim, int aType, int lvl)
+    {
+        items = new ArrayList<Thing>();
+        name = victim;
+        type = aType;
+        level = lvl;
+        lives = 1;
+        attack = 0;
+        defense = 0;
+        
+        if (type == HERO) makeHero();
+        else if (type<=6 && type<=9) makeRobot(level);
+        else makeMonster(level);
+    }
+
+    /**
+     * Called if person is made of type hero
+     * sets maxHealth to 50, and sets health to maxHealth
+     * and gives default weapon of dagger, but no default armor
+     */
+    public void makeHero()
+    {
+        lives = 3;
+        
+        maxHealth = 100;
+        health = maxHealth;
+        
+        //default
+        Equip knife = new Equip("small knife", Equip.WEAPON, 20);
+        knife.changeOwner(this);
+        knife.equipTo(this);
+        Equip plainClothes = new Equip("plain clothes", Equip.ARMOR, 0);
+        plainClothes.changeOwner(this);
+        plainClothes.equipTo(this);
+    }
+    
+    /**
+     * Called if person is made of type boss
+     * sets maxHealth 1000, and sets health to maxHealth
+     * and gives default weapon of claws and default armor of hard skin
+     */
+    private void makeBoss()
+    {
+        maxHealth = 1000;
+        health = maxHealth;
+        
+        weapon = new Equip("Claws of Death", Equip.WEAPON, 550);
+        armor = new Equip("Inpenetrable skin", Equip.ARMOR, 200);
+    }
+    
+    /**
+     * Called if person is made of type monster
+     * sets maxHealth relative to lvl of monster, and sets health to maxHealth
+     * and gives default weapon&armor of according to type
+     */
+    private void makeMonster(int lvl)
+    {
+        maxHealth = lvl*12;
+        health = maxHealth;
+        
+        Equip tempWeapon = null;
+        Equip tempArmor = null;
+        if (type == GOLEM)
+        {
+            tempWeapon = new Equip("roll smash", Equip.WEAPON, lvl*6);
+            tempArmor = new Equip("rock body", Equip.ARMOR, lvl);
+        }
+        else if (type == GHOST)
+        {
+            tempWeapon = new Equip("scythe", Equip.WEAPON, lvl*6);
+            tempArmor = new Equip("magic armor", Equip.ARMOR, lvl);
+        }
+        else if (type == SLIME)
+        {
+            tempWeapon = new Equip("liquip attack", Equip.WEAPON, lvl*6);
+            tempArmor = new Equip("shock absorb", Equip.ARMOR, lvl);
+        }
+        else
+        {
+            tempWeapon = new Equip("teeth", Equip.WEAPON, lvl*8);
+            tempArmor = new Equip("hardskin", Equip.ARMOR, lvl);
+        }
+        tempWeapon.changeOwner(this);
+        tempArmor.changeOwner(this);
+        tempWeapon.equipTo(this);
+        tempArmor.equipTo(this);
+    }
+    
+    /**
+     * Called if person is made of type robot
+     * sets maxHealth relative to lvl of monster, and sets health to maxHealth
+     * and gives default weapon&armor according to type
+     */
+    private void makeRobot(int lvl)
+    {
+        maxHealth = lvl*10;
+        health = maxHealth;
+        
+        Equip tempWeapon = null;
+        Equip tempArmor = null;
+        if (type == SOLDIER)
+        {
+            tempWeapon = new Equip("rifle", Equip.WEAPON, lvl*4);
+            tempArmor = new Equip("leather armor", Equip.ARMOR, lvl*2);
+        }
+        else if (type == ELF)
+        {
+            tempWeapon = new Equip("bow", Equip.WEAPON, lvl*4);
+            tempArmor = new Equip("magic armor", Equip.ARMOR, lvl*2);
+        }
+        else if (type == KNIGHT)
+        {
+            tempWeapon = new Equip("sword", Equip.WEAPON, lvl*4);
+            tempArmor = new Equip("splendid shield", Equip.ARMOR, lvl*2);
+        }
+        else if (type == MAGICIAN)
+        {
+            tempWeapon = new Equip("magic", Equip.WEAPON, lvl*4);
+            tempArmor = new Equip("magic armor", Equip.ARMOR, lvl*2);
+        }
+        else
+        {
+            tempWeapon = new Equip("broom stick", Equip.WEAPON, lvl*4);
+            tempArmor = new Equip("straw", Equip.ARMOR, lvl*2);
+        }
+        tempWeapon.changeOwner(this);
+        tempArmor.changeOwner(this);
+        tempWeapon.equipTo(this);
+        tempArmor.equipTo(this);
+    }
+
+    //returns this person's name
+    public String getName()
+    {
+        return name;
+    }
+
+    //returns the type of this person
+    public int getType()
+    {
+        return type;
+    }
+
+    //returns the room the person is in
+    public Room getRoom()
+    {
+        return room;
+    }
+    
+    /**
+     * returns health of this person
+     * @return health - health of person
+     */
+    public int getHealth()
+    {
+        return health;
+    }
+    
+    /**
+     * returns the level of this person
+     * @return level - level of this person
+     */
+    public int getLevel()
+    {
+        return level;
+    }
+    
+    /**
+     * returns the defense of this person
+     * 
+     * @return defense - defense of this person
+     */
+    public int getAtk()
+    {
+        return attack;
+    }
+    
+    /**
+     * returns the defense of this person
+     * 
+     * @return defense - defense of this person
+     */
+    public int getDef()
+    {
+        return defense;
+    }
+    
+    /**
+     * returns the weapon or armor of this person
+     * @param type - Thing.WEAPON or Thing.ARMOR
+     * @return weapon/armor
+     */
+    public Equip getEquip(int type)
+    {
+        if (type==Equip.WEAPON)
+            return weapon;
+        else if (type == Equip.ARMOR)
+            return armor;
+        return null;
+    }
+    
+    //returns all the things this person is carrying
+    public ArrayList<Thing> getThings()
+    {
+    	ArrayList<Thing> inventory = new ArrayList<Thing>();
+    	for (int i=0; i<items.size(); i++)
+    		inventory.add(items.get(i));
+    	return inventory;
+    }
+
+    //moves the person to the given room
+    // why can't I just write room = nextRoom; ???
+    public void changeRoom(Room nextRoom)
+    {
+        //remove the person from the old room (if already in one)
+        if (room != null)
+            room.remove(this);
+
+        //change my room to be the next one
+        room = nextRoom;
+
+        //add myself to the new room
+        room.add(this);
+    }
+
+    //precondition:  person is not the hero
+    //postcondition: person has acted, by moving, eating people, etc.
+    //modified so that monsters/robots do not move from their assigned room
+    //modified so that robots and monsters in the room attack an entering hero with 1/5 chance
+    public void act(Person hero)
+    {   
+        // dead people can't act
+        if (room != null)
+        {
+            if(Game.random(5)==0)
+            {
+                if (type == MONSTER) 
+                    eat(hero);
+                else 
+                    attack(hero);
+            }
+        }
+    }
+
+    //causes the person to move to a random neighbor (or stay still)
+    private void move()
+    {
+        int num = Game.random(4);
+        String direction;
+        if (num == 0)
+            direction = "north";
+        else if (num == 1)
+            direction = "east";
+        else if (num == 2)
+            direction = "south";
+        else //num == 3
+            direction = "west";
+        Room nextRoom = room.nextRoom(direction);
+        if (nextRoom != null)
+        {
+            changeRoom(nextRoom);
+            
+            //Monster or Robot greets everyone was already in the room
+            ArrayList<Person> peopleList = new ArrayList<Person>();
+            
+            peopleList = nextRoom.getPeople();
+            peopleList.remove(name);
+            
+            String greetings ="Hey ";
+            for (int i=0; i<peopleList.size(); i++)
+            	greetings += peopleList.get(i).getName() + ", ";
+
+            if (!(peopleList.size()==0))
+            	say(greetings);
+        }   
+        
+    }
+    
+    /**
+     * add(Thing thing) adds thing to list of things into this room
+     * 
+     * @param thing - adds given thing to list of things in the room
+     */
+    public void add(Thing newThing)
+    {
+    	items.add(newThing);
+    }
+    
+    /**
+     * remove(Thing thing) removes given thing from items list of this room
+     * 
+     * @param thing - removes this thing from items list of this room
+     */
+    public void remove(Thing aThing)
+    {
+        boolean found = false;
+        for (int i = 0; i < items.size() && !found; i++)
+        {
+            if (items.get(i) == aThing)
+            {
+                items.remove(i);
+                found = true;
+            }
+        }
+
+        if(!found) throw new IllegalArgumentException("Item not found:  " + aThing);
+    }
+    
+    /**
+     * Equip unequips the current equipped item
+     * then takes out the given item from the hero's arraylist of things and equips it if it is a weapon/armor
+     * 
+     * @param thing - adds given thing to list of things in the room
+     */
+    public void equip(Equip equipment)
+    {   
+        unequip(equipment);
+        
+        if (equipment.getType() == Equip.WEAPON)
+        {
+            weapon = equipment;
+            attack += weapon.getRating();
+        }
+        else //if (equipment.getType() == Equip.ARMOR)
+        {
+            armor = equipment;
+            defense += armor.getRating();
+        }
+    }
+    
+    private void unequip(Equip equipment)
+    {
+        items.remove(equipment);
+        
+        if (weapon!=null && equipment.getType()==Equip.WEAPON)
+        {
+            attack -= weapon.getRating();
+            items.add(weapon);
+        }
+        else if (armor!=null && equipment.getType() == Equip.ARMOR)
+        {
+            items.add(armor);
+            defense -= armor.getRating();
+        }
+    }
+
+    //sometimes causes this person to eat a random person in the room
+    //modified to take into account of victim's armor
+    //modified to take in a vicitm instead of getRandomPerson
+    private void eat(Person victim)
+    {   
+        int defense = 0;
+        if (victim.getEquip(Equip.ARMOR)!=null)
+            defense = victim.getEquip(Equip.ARMOR).getRating();
+        
+        int hits = weapon.getRating() - defense;
+        if (hits < 0)
+            hits = 0;
+        
+        if (victim != this) //don't eat yourself
+        {
+            say("Grrr!  I eat tasty " + victim.getName() + "!");
+            victim.suffer(hits);
+        }
+    }
+
+    //causes the person to say the given message
+    public void say(String message)
+    {
+        System.out.println("*" + name + " - " + message);
+    }
+
+    //causes this person to suffer the given amount of damage
+    public void suffer(int hits)
+    {
+        health = health - hits;
+        if (health < 0)
+            health = 0;
+        if (hits == 0)
+            say("Hahaha! I defened myself with " + armor.getName() + " and still have " + health + " left!");
+        else
+            say("Ouch!  " + hits + " hits is more than I want! I only have " + health + " left!");
+        if (health <= 0)
+            die();
+    }
+
+    //causes this person to die
+    public void die()
+    {   
+        lives--;
+        
+        say("SHREEEEK!  I, uh, suddenly feel very faint...");
+
+        if (type == HERO)
+        {
+            // say goodbye and die
+            System.out.println("You died. You have " + lives + " lives left");
+            
+        }
+        else if (name.toLowerCase().equals("grendel"))
+        {
+            System.out.println("You defeated overlord Grendel!");
+            System.out.println("Thanks for playing!");
+            System.exit(0);
+        }
+        //not end of the game 
+        else
+        {
+          //this person will drop his weapon or armor each with 1/3 chance
+            if (Game.random(3)==0)
+            {
+                if (weapon!=null) 
+                    items.add(weapon);
+            }
+            if (Game.random(3)==0)
+            {
+                if (armor!=null) 
+                    items.add(armor);
+            }
+            
+            //create string of items this person had
+            String thingsDropped = Game.makeQuantityList(items);
+            if (items.size()==0)
+                System.out.println(name + " didn't drop anything");
+            else 
+                System.out.println(name + " dropped: " + thingsDropped);
+            
+            //put this person's things into the room
+            for (int i=items.size()-1; i>=0; i--)
+                items.get(i).changeOwner(room);
+            
+            room.remove(this);
+            System.out.println();
+            System.out.println(room.otherPeopleString() + "\n" + room.thingString());
+            room = null;
+        }
+    }
+    
+    //causes this person to take 
+    public void take(Thing t)
+    {
+        if (t==null)
+            System.out.println("That item does not exist in this room");
+    	
+    	else if (t.getOwner().equals(this))
+    		System.out.println(this.getName() + " is already carrying that!");
+        
+    	else
+    	{
+    		if (this.getRoom().equals(t.getOwner()))
+    			say("I took " + t.getName() + " from " + t.getOwner().getName());
+    		t.changeOwner(this);
+    	}
+    }
+    
+    /**
+     * this person takes a random thing from the room he/she is in
+     */
+    public void takeSomething()
+    {
+    	Thing item = room.getRandomThing();
+    	if (item != null)
+    		take(item);
+    }
+    
+    /**
+     * this person attacks the given person
+     * precondition: person or robot
+     * 
+     * @param victim - name of person you want to attack
+     */
+    public void attack(Person victim)
+    {   
+        int victimDef = 0;
+        int hits = 0;
+        String weaponName = "bare hands";
+        
+        victimDef = victim.getDef();
+        
+        //1/4 chance of critical or twice damage 
+        hits = (attack - victimDef) + (int)((Math.random()*(attack*.4))-(attack*.2));
+        if (hits < 0)
+            hits = 0;
+        
+        if (weapon!=null)
+            weaponName = weapon.getName();
+        
+        //1/6 chance of missing when attacking
+        if (!victim.equals(this))
+        {
+            if(Game.random(6)!=0)
+            {
+                //1/4 chance of double damage
+                if (Game.random(8)!=0)
+                    say("I attack " + victim.getName() + " with my " + weaponName);
+                else 
+                {
+                    say("I inflict critical damage on " + victim.getName() + " with my " + weaponName);
+                    hits += hits;
+                }
+                victim.suffer(hits);
+            }
+            else
+                say("AHHH I attacked, but " + victim.getName() + " dodged my attack!");
+        }
+        
+        //if victim dies, hero's maxHealth increases
+        if (victim.getHealth()<=0)
+        {
+            maxHealth += 5;
+            attack += 10;
+            defense += 5;
+        }
+    }
+    
+    /**
+     * getStatus prints out the health, weapon, armor, and items of this person
+     */
+    public void getStatus()
+    {
+        //if this person has no weapon or armor, these values are kept
+        String weaponName = "bare hands";
+        String armorName = "none";
+        
+        if (weapon!=null)
+            weaponName = weapon.getName();
+        if (armor!=null)
+            armorName = armor.getName();
+        
+        String itemList = "";
+        for (Thing t : items)
+            itemList += t.getName() + ", ";
+        
+        System.out.println("Health: " + health + "/" + maxHealth + "\n" +
+                         "Location: " + room.getName() + "\n" +
+                         "Weapon: " + weaponName + " (" + attack + " ATK" + ")" + "\n" +
+                         "Armor: " + armorName + " (" + defense + " DEF" + ")");
+        if (type==HERO)
+             System.out.println("Iventory: " + Game.makeQuantityList(items));
+    }
+    
+    /**
+     * use gets the item's healing rating and adds it to the current health, but doesnt exceed the maxHealth
+     * then changes the amount to 1 less than before
+     * 
+     * @param item - item used
+     */
+    public void use(Consume item)
+    {
+        int gain = item.getRating();
+        health += gain;
+        
+        if (health > maxHealth)
+            health = maxHealth;
+        
+        say("I gained " + gain + " health by using " + item.getName() + " and now have " + health + "/" + maxHealth);
+            
+        items.remove(item);
+    }
+    
+    public void teleport(Room target)
+    {
+        for (int i=0; i<items.size(); i++)
+        {
+            if (items.get(i).getType()==Consume.SCROLL)
+                items.remove(i);
+        }
+        
+        changeRoom(target);
+        System.out.println();
+        System.out.println(room.longDescription());
+    }
+    
+    /**
+     * restoreHealth sets hero's health to the maximum health
+     */
+    public void restoreHealth()
+    {
+        health = maxHealth;
+        
+        say("Yay my health is now " + maxHealth + "!");
+    }
+    
+    /**
+     * called when hero dies and has lives left
+     * @param target - hero revived in this room
+     */
+    public void reviveHero(Room target)
+    {
+        if (lives > 0)
+        {
+            System.out.println("Do you want to play again?");
+            if (Game.askBoolean())
+            {
+                health = maxHealth;
+                getStatus();
+                System.out.println();
+                changeRoom(target);
+                System.out.println(room.longDescription());
+            }
+            else
+            {
+                System.out.println("Thanks for playing!");
+                System.exit(0);
+            }
+        }
+        else
+        {
+            System.out.println("Thanks for playing!");
+            System.exit(0);
+        }
+    }
+}

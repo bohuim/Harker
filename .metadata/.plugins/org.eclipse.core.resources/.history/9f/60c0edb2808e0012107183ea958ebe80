@@ -1,0 +1,50 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+
+
+/**
+ * 
+ * @author Dennis Moon
+ * @version Mar 16, 2013
+ * 
+ * @Revision:
+ *     Mar 16, 2013
+ */
+class MainC
+{
+    static int ADD = 0;
+    static int SUBTRACT = 1;
+    static int MULTIPLY = 2;
+    static int DIVIDE = 3;
+    
+    public static void main(String[] args) throws Exception
+    {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        
+        String  str = br.readLine();
+        String[] input = str.split(" ");
+        
+        ArrayList<String> list = new ArrayList<String>();
+        for(int i = 0; i < input.length; i++)
+            list.add(input[i]);
+        
+        
+    }
+    
+    public float eval(String[] str) 
+    {
+        float n1 = (float) Integer.parseInt(str[0]);
+        float n2 = (float) Integer.parseInt(str[2]);
+        int op = Integer.parseInt(str[1]);
+        if(op == ADD)
+            return n1 + n2;
+        else if(op == SUBTRACT)
+            return n1 - n2;
+        else if(op == MULTIPLY)
+            return n1 * n2;
+        else if(op == DIVIDE)
+            return n1 / n2;
+        return 0;  
+    }
+}

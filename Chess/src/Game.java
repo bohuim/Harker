@@ -1,0 +1,306 @@
+import java.awt.Color;
+import java.io.*;
+import java.net.*;
+import java.util.*;
+
+/**
+ * Game is central class of Chess that sets up the Board, Display, pieces, and Players. </br>
+ * It is assumed that a game of Chess only has 2 players</br></br>
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li>{@code newGame()} creates new Board, Display, Pieces, and Player to start Chess with indefinite loop</li>
+ *      <li>{@code directory()} returns file directory of given img name</li>
+ *      <li>{@code getBoard()} - returns the board of this Game</li>
+ *      <li>{@code getDisplay()} - returns the display to the board of this game </li>
+ *      <li>{@code setPlayer(#, player)} - sets pointer of given # as the given player </li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 22, 2013
+ * 
+ * @Revision
+ *     Apr 22, 2013 - class created & main() and directory() method added
+ *     Apr 29, 2013 - nextTurn() added
+ *     May 10, 2013 - nextTurn() modified to call Move.execute()
+ *     May 12, 2013 - nextTurn() modified back to call Board.executeMove(move)
+ *     May 13, 2013 - Game made into look like a class, with specialized methods and not everything in main() method
+ *     May 14, 2013 - instance fields {@code board, display, p1, p2, currentPlayer} added 
+ *     May 17, 2013 - Game Constructor created, play() method added
+ *     May 19, 2013 - colorName() method added
+ *     May 22, 2013 - getBoard(), getDisplay(), setPlayer() methods added
+ */
+public class Game 
+{
+    private Board board;
+    private BoardDisplay display;
+    
+    private Player p1;
+    private Player p2;
+    private Player currentPlayer;
+    
+    public static void main(String[] args) throws IOException
+    {
+        Game chess = new Game();
+        chess.play();
+    }
+    
+    /**
+     * <b>Constructor: </b>Game</br> 
+     * <b>Usage: </b>{@code Game chess = new Game()}</br>
+     * -------------------------------</br>
+     * Sets up, but does not initiate game, by creating new board, display, pieces, and players; then refreshs the display. 
+     */
+    public Game()
+    {
+        board = new Board();
+        display = new BoardDisplay(board);
+        
+        resetBoard();
+        setPlayer(1, new HumanPlayer("Dennis", Color.WHITE, board, display));
+        setPlayer(2, new SmartPlayer("Bot", Color.BLACK, 2, board));
+        display.showBoard();
+    }
+    
+    /**
+     * <b>Method: </b>getBoard</br> 
+     * <b>Usage: </b>{@code Game.getBoard()}</br>
+     * -------------------------------</br>
+     * Returns the board in which this Game is being played on.
+     * 
+     * @return board of Chess Game
+     */
+    public Board getBoard()
+    {
+        return board;
+    }
+    
+    /**
+     * <b>Method: </b>getDisplay</br> 
+     * <b>Usage: </b>{@code Game.getDisplay()}</br>
+     * -------------------------------</br>
+     * Returns the display that is the GUI for the board in this Game.
+     * 
+     * @return display for board in this Game
+     */
+    public BoardDisplay getDisplay()
+    {
+        return display;
+    }
+    
+    /**
+     * <b>Method: </b>play</br> 
+     * <b>Usage: </b>{@code Game.play()}</br>
+     * -------------------------------</br>
+     * Chess program is run indefinitely until user manually closes display. </br>
+     * Within the program, each game is run until a checkmate is reached. </br>
+     * A new game can be started by pressing F2.
+     */
+    public void play()
+    {
+        while(true)
+        {
+            currentPlayer = p1;
+            nextTurn(currentPlayer);
+            while(!board.isInCheckMate((currentPlayer = otherPlayer(currentPlayer)).getColor()))
+                nextTurn(currentPlayer);
+            
+            System.out.print(Game.colorName(currentPlayer.getColor()) + " is in checkmate. ");
+            System.out.println(colorName(otherPlayer(currentPlayer).getColor()) + " wins!");
+            System.out.println("For new game, press F2");
+        }
+    }
+    
+    /**
+     * <b>Method: </b>resetBoard</br> 
+     * <b>Usage: </b>{@code resetBoard()}</br>
+     * -------------------------------</br>
+     * Creates all necessary pieces of a chess game and inserts them into the correct locations.
+     */
+    private void resetBoard()
+    {   
+        //Pawn
+        Piece[] whitePawns = new Piece[8];
+        for (int i=0; i<8; i++)
+        {
+            whitePawns[i] = new Pawn(Color.WHITE, directory("white_pawn"));
+            whitePawns[i].putSelfInGrid(board, new Location(6, i));
+        }
+        Piece[] blackPawns = new Piece[8];
+        for (int i=0; i<8; i++)
+        {
+            blackPawns[i] = new Pawn(Color.BLACK, directory("black_pawn"));
+            blackPawns[i].putSelfInGrid(board, new Location(1, i));
+        }
+        //Bishop
+        Piece blackBishop1 = new Bishop(Color.BLACK, directory("black_bishop"));
+        blackBishop1.putSelfInGrid(board, new Location(0, 2));
+        Piece blackBishop2 = new Bishop(Color.BLACK, directory("black_bishop"));
+        blackBishop2.putSelfInGrid(board, new Location(0, 5));
+        Piece whiteBishop1 = new Bishop(Color.WHITE, directory("white_bishop"));
+        whiteBishop1.putSelfInGrid(board, new Location(7, 2));
+        Piece whiteBishop2 = new Bishop(Color.WHITE, directory("white_bishop"));
+        whiteBishop2.putSelfInGrid(board, new Location(7, 5));
+        //Knight
+        Piece blackKnight1 = new Knight(Color.BLACK, directory("black_knight"));
+        blackKnight1.putSelfInGrid(board, new Location(0, 1));
+        Piece blackKnight2 = new Knight(Color.BLACK, directory("black_knight"));
+        blackKnight2.putSelfInGrid(board, new Location(0, 6));
+        Piece whiteKnight1 = new Knight(Color.WHITE, directory("white_knight"));
+        whiteKnight1.putSelfInGrid(board, new Location(7, 1));
+        Piece whiteKnight2 = new Knight(Color.WHITE, directory("white_knight"));
+        whiteKnight2.putSelfInGrid(board, new Location(7, 6));
+        //Rook
+        Piece blackRook1 = new Rook(Color.BLACK, directory("black_rook"));
+        blackRook1.putSelfInGrid(board, new Location(0, 0));
+        Piece blackRook2 = new Rook(Color.BLACK, directory("black_rook"));
+        blackRook2.putSelfInGrid(board, new Location(0, 7));
+        Piece whiteRook1 = new Rook(Color.WHITE, directory("white_rook"));
+        whiteRook1.putSelfInGrid(board, new Location(7, 0));
+        Piece whiteRook2 = new Rook(Color.WHITE, directory("white_rook"));
+        whiteRook2.putSelfInGrid(board, new Location(7, 7));
+        //King
+        Piece blackKing = new King(Color.BLACK, directory("black_king"));
+        blackKing.putSelfInGrid(board, new Location(0, 4));
+        Piece whiteKing = new King(Color.WHITE, directory("white_king"));
+        whiteKing.putSelfInGrid(board, new Location(7, 4));
+        //Queen
+        Piece blackQueen = new Queen(Color.BLACK, directory("black_queen"));
+        blackQueen.putSelfInGrid(board, new Location(0, 3));
+        Piece whiteQueen = new Queen(Color.WHITE, directory("white_queen"));
+        whiteQueen.putSelfInGrid(board, new Location(7, 3));
+    }
+    
+    /**
+     * <b>Method: </b>resetPlayers</br> 
+     * <b>Usage: </b>{@code resetPlayers(true, false)}</br>
+     * -------------------------------</br>
+     * Creates two new players to play the game by taking in two boolean values for each player. </br>
+     * True will create a HumanPlayer, false will create a RandomPlayer.
+     * 
+     * @param humanP1 - whether P1 is human
+     * @param humanP2 - whether P2 is human
+     */
+    private void resetPlayers(boolean humanP1, boolean humanP2)
+    {   
+        if (humanP1) 
+            p1 = new HumanPlayer("Player 1", Color.WHITE, board, display);
+        else
+            p1 = new SmartPlayer("Player 1", Color.WHITE, 2, board);
+        
+        if (humanP2) 
+            p2 = new HumanPlayer("Player 2", Color.BLACK, board, display);
+        else
+            p2 = new SmartPlayer("Player 2", Color.BLACK, 2, board);
+    }
+    
+    /**
+     * <b>Method: </b>setPlayer</br> 
+     * <b>Usage: </b>{@code Game.setPlayer(p#, player)}</br>
+     * -------------------------------</br>
+     * Sets the pointer of given number as the given player.
+     * 
+     * @param p - number of player pointer to set
+     * @param player to set pointer as
+     */
+    public void setPlayer(int p, Player player)
+    {
+        if (p==1) p1 = player;
+        else if (p==2) p2 = player;
+    }
+    
+    /**
+     * <b>Method: </b>switchPlayer</br> 
+     * <b>Usage: </b>{@code switchPlayer()}</br>
+     * -------------------------------</br>
+     * Switches {@code currentPlayer} to point to whichever player it is not currently pointing to.
+     * 
+     * @precondition only two players exist
+     */
+    private Player otherPlayer(Player current)
+    {
+        if (current == p1)
+            return p2;
+        return p1;
+    }
+    
+    /**
+     * <b>Method: </b>nextTurn</br> 
+     * <b>Usage: </b>{@code nextTurn(nextPlayer)}</br>
+     * -------------------------------</br>
+     * Switches over the turn from current turn to the specified player. </br>
+     * <ol>
+     *  <li>Change frame title to current player's name<li>
+     *  <li>Clear all highlighted colors on display</li>
+     *  <li>Get player's nextMove</li>
+     *  <li>Execute nextMove by calling {@code board.executeMove(nextMove)}</li>
+     *  <li>Switches turn in display</li>
+     *  <li>Highlights source as Orange & destination as Yellow</li>
+     * </ol>
+     * 
+     * @param player to turn over to
+     */
+    private void nextTurn(Player player)
+    {
+        display.setTitle("Chess - Current turn: " + player.getName());
+        display.clearColors();
+        
+        Move nextMove = player.nextMove();
+        
+        if (nextMove!=null)
+        {     
+            board.executeMove(nextMove);
+            display.switchTurn();
+            display.setColor(nextMove.getSource(), Color.ORANGE);
+            display.setColor(nextMove.getDestination(), Color.YELLOW);
+            
+            try {Thread.sleep(500);} catch(InterruptedException e) {}
+        }
+    }
+    
+    /**
+     * <b>Method: </b>directory</br> 
+     * <b>Usage: </b>{@code Game.directory("color_piece")}</br>
+     * -------------------------------</br>
+     * Given the name of the img file, returns the file directory of the img.
+     * 
+     * @param imgName of piece
+     * @return directory of the imgName
+     */
+    public static String directory(String imgName)
+    {
+        return "images/" + imgName + ".gif";
+    }
+    
+    /**
+     * <b>Method: </b>enemyColorOf</br> 
+     * <b>Usage: </b>{@code enemyColorOf(color)}</br>
+     * -------------------------------</br>
+     * Returns the reverse of the given color. 
+     * 
+     * @param color to flip
+     * @return flipped color
+     */
+    public static Color enemyColorOf(Color color)
+    {
+        if (color.equals(Color.BLACK))
+            return Color.WHITE;
+        return Color.BLACK;
+    }
+    
+    /**
+     * <b>Method: </b>colorName</br> 
+     * <b>Usage: </b>{@code Game.colorName(color)}</br>
+     * -------------------------------</br>
+     * Returns the English name of the given color instead of a rgb value.
+     * 
+     * @param color to get name of
+     * @return English name of color
+     */
+    public static String colorName(Color color)
+    {
+        if (color.equals(Color.WHITE))
+            return "WHITE";
+        return "BLACK";
+    }
+}

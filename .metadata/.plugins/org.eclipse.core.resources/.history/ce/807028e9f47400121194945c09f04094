@@ -1,0 +1,71 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: perimeter
+*/
+public class perimeter
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out, true);
+        
+//        BufferedReader f = new BufferedReader(new FileReader("perimeter.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("perimeter.out")));
+        
+        perimeter p = new perimeter();
+        
+        Space[][] field = new Space[100][100];
+        int n = Integer.parseInt(f.readLine());
+        Space[] list = new Space[n];
+        for (int i=0; i<n; i++)
+        {
+            StringTokenizer st = new StringTokenizer(f.readLine());
+            int x = Integer.parseInt(st.nextToken())-1;
+            int y = 100-Integer.parseInt(st.nextToken());
+            list[i] = p.newSpace(x,y);
+            field[x][y] = list[i];
+        }
+        
+        for (int i=0; i<n; i++)
+            list[i].determine(field);
+        
+    }
+    
+    public Space newSpace(int x, int y)
+    {
+        return new Space(x, y);
+    }
+    
+    class Space
+    {
+        int x, y;
+        boolean n, e, s, w;
+        
+        Space(int a, int b)
+        {
+            x = a;
+            y = b;
+            
+            n = false;
+            e = false;
+            s = false; 
+            w = false;
+        }
+        
+        public void determine(Space[][] field)
+        {
+            if (x==0 || field[x-1][y]==null)
+                w = true;
+            if (x==99 || field[x+1][y]==null)
+                e = true;
+            if (y==0 || field[x][y-1]==null)
+                s = true;
+            if (y==99 || field[x][y+1]==null)
+                n = true;
+        }
+    }
+}

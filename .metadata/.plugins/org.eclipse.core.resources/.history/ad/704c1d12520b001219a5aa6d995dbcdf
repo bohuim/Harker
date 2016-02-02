@@ -1,0 +1,27 @@
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+
+public class InputKey implements KeyListener
+{
+    public InputKey()
+    {
+        this.addKeyListener(new InputKey());
+    }
+
+    public void keyTyped(KeyEvent e)
+    {
+    }
+
+    public void keyPressed(KeyEvent e)
+    {
+        char c = e.getKeyChar();
+        System.out.println(c + " was released");
+    }
+
+    public void keyReleased(KeyEvent e)
+    {
+        char c = e.getKeyChar();
+        System.out.println(c + " was released");
+    }
+
+}

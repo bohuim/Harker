@@ -1,0 +1,42 @@
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+
+public class FontTest
+{
+    private JLabel label;
+    private JFrame frame;
+    private Font[] fonts;
+    private GraphicsEnvironment e;
+    
+    public FontTest()
+    {
+        e = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        fonts = e.getAllFonts();
+        
+        frame = new JFrame();
+        label = new JLabel();
+        frame.add(label);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+        
+        for (Font f : fonts)
+        {
+            Font test = new Font(f.getFontName(), Font.PLAIN, 24);
+            label.setFont(test);
+            label.setText("Test");
+            
+            try
+            {
+                Thread.sleep(3000);
+            }
+            catch(InterruptedException e)
+            {
+                
+            }
+        }
+    }
+}

@@ -1,0 +1,160 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+/**
+ * Fancier display of the tetris game
+ * 
+ * @author Dennis
+ */
+public class Display implements KeyListener
+{
+    private JFrame frame;
+    private JPanel centerPanel;
+    private JPanel leftPanel;
+    private JPanel bottomLeftPanel;
+    private JPanel rightPanel;
+    private JLabel score;
+    
+    private JPanel gamePanel;
+    private MyBoundedGrid<Block> gameBoard;
+    private JPanel[][] gameGrid;
+    
+    private JPanel holdPanel;
+    private MyBoundedGrid<Block> holdBoard;
+    private JPanel[][] holdGrid;
+    
+    private JPanel nextMainPanel;
+    private JPanel otherNextPanel;
+    private MyBoundedGrid[] nextBoards;
+    private JPanel[][][] nextGrids;
+    
+    private JLabel level;
+    private JLabel linesCleard;
+    
+    /**
+     * Constructor: Display(tetrisBoard, holdBoard, nextBoardArray)
+     * Usage: Display display = new Display(tetrisBoard, holdBoard, nextBoardArray);
+     * -------------------------------------------------------------------------------
+     * @param gameB - main tetris game board
+     * @param holdB - board hold tetrad goes in
+     * @param nextB - board the next tetrads are stored in
+     */
+    public Display(MyBoundedGrid<Block> gameB, MyBoundedGrid<Block> holdB, MyBoundedGrid<Block>[] nextB)
+    {
+        gameBoard = gameB;
+        holdBoard = holdB;
+        nextBoards = nextB;
+        
+        gameGrid = new JPanel[gameBoard.getNumRows()][gameBoard.getNumCols()];
+        holdGrid = new JPanel[holdBoard.getNumRows()][holdBoard.getNumCols()];
+        for (int i=0; i<nextBoards.length; i++)
+            nextGrids = new JPanel[i][holdBoard.getNumRows()][holdBoard.getNumCols()];
+        
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                createAndShowGUI();
+            }
+        });
+
+        //Wait until display has been drawn
+        try
+        {
+            while (frame == null || !frame.isVisible())
+                Thread.sleep(1);
+        }
+        catch(InterruptedException e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+    
+    private void createAndShowGUI()
+    {
+        frame = new JFrame();
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400, 400);
+        frame.setLayout(null);        
+        frame.addKeyListener(this);
+        frame.setFocusable(true);
+        frame.setVisible(true);
+        
+        //
+        int sWidth = 20;
+        int sHeight = 20;
+        centerPanel = new JPanel();
+        centerPanel.setBackground(Color.WHITE);
+        centerPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        centerPanel.setLocation(60,45);
+        centerPanel.setSize(280,180);
+        
+        score = new JLabel();
+        score.setOpaque(true);
+        //score.setFont(new Font("Dialog", Font.PLAIN, 24));
+        score.setForeground(Color.ORANGE);
+        score.setSize(180,80);
+        score.setLocation(60,5);
+        frame.add(score);
+        
+        gamePanel = new JPanel();
+        gamePanel.setLayout(new GridLayout(gameBoard.getNumRows(), gameBoard.getNumCols()));
+        gamePanel.setSize(sWidth*gameBoard.getNumRows(), sHeight*gameBoard.getNumCols());
+        gamePanel.setLocation(40, 45);
+        for (int row = 0; row < gameGrid.length; row++)
+            for (int col = 0; col < gameGrid[row].length; col++)
+            {
+                gameGrid[row][col] = new JPanel();
+                gameGrid[row][col].setBackground(Color.BLACK);
+                gameGrid[row][col].setPreferredSize(new Dimension(sWidth, sHeight));
+                gamePanel.add(gameGrid[row][col]);
+            }
+        centerPanel.add(gamePanel);
+        frame.add(centerPanel);
+        
+        //
+//        leftPanel = new JPanel();
+//        leftPanel.setSize(90,90);
+//        leftPanel.setLocation(5,80);
+//        leftPanel.setBackground(Color.WHITE);
+//        leftPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY));
+//        
+//        holdPanel = new JPanel();
+//        holdPanel.setLayout(new GridLayout(holdBoard.getNumRows(), holdBoard.getNumCols()));
+//        holdPanel.setSize(sWidth*holdBoard.getNumRows(), sHeight*holdBoard.getNumCols());
+//        holdPanel.setLocation(5,5);
+//        for (int row = 0; row < holdGrid.length; row++)
+//            for (int col = 0; col < holdGrid[row].length; col++)
+//            {
+//                holdGrid[row][col] = new JPanel();
+//                holdGrid[row][col].setBackground(Color.BLACK);
+//                holdGrid[row][col].setPreferredSize(new Dimension(sWidth, sHeight));
+//                holdPanel.add(holdGrid[row][col]);
+//            }
+//        leftPanel.add(holdPanel);
+//        frame.add(leftPanel);
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e)
+    {
+        // TODO Auto-generated method stub
+        
+    }
+}

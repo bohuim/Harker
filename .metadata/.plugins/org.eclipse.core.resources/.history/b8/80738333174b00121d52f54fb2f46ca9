@@ -1,0 +1,111 @@
+import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.Iterator;
+
+
+/**
+ * Main game class of Breakout
+ * 
+ * @author Dennis Moon
+ */
+public class Breakout extends KeyAdapter
+{
+    private ShapeDisplay display;
+    private Ball ball;
+    private Paddle paddle;
+    
+    /**
+     * Constructor: Breakout
+     * Usage: Breakout breakout = new Breakout()
+     * ---------------------------
+     * creates a new ShapeDisplay & sets title as "Breakout"
+     */
+    public Breakout()
+    {
+        display = new ShapeDisplay();
+        display.setTitle("Breakout");
+        display.addKeyListener(this);
+        
+        ball = new Ball();
+        display.add(ball);
+        
+        paddle = new Paddle();
+        display.add(paddle);
+    }
+    
+    /**
+     * Method: setup()
+     * Usage: to be used in Breakout constructor
+     * -------------------------------
+     */
+    private void setup()
+    {
+        display.add(new Brick(Color.RED,0,0));
+    }
+    
+    /**
+     * Method: checkForCollision()
+     * Usage: called every run in play
+     * ---------------------------
+     * calls ShapeDisplay's iterator of shapes in the display
+     * and if the shape is an obstacle that overlaps with the ball
+     * the ball's trajectory is changed 
+     */
+    private void checkForCollision()
+    {
+        Iterator<Shape> shapes = display.shapes();
+        while(shapes.hasNext())
+        {
+            Shape temp = shapes.next();
+            if (temp instanceof Obstacle && ((Obstacle) temp).overlapsWith(ball))
+            {
+                if(((Obstacle) temp).handleCollision(ball))
+                    shapes.remove();
+                break;
+            }
+        }
+    }
+    
+    /**
+     * Method: keyPressed()
+     * Usage: changes the paddle's sideways position
+     * ----------------------------
+     * only takes in LEFT & RIGHT ArrowKeys 
+     * and changes paddle's position accordingly
+     * @param e
+     */
+    public void keyPressed(KeyEvent e)
+    {
+        int key = e.getKeyCode();
+        if (key == KeyEvent.VK_LEFT)
+            paddle.moveLeft();
+        else if (key == KeyEvent.VK_RIGHT)
+            paddle.moveRight();
+    }
+    
+    /**
+     * Method: play()
+     * Usage: breakout.play()
+     * --------------------------
+     * runs an infinite loop
+     * in which the ball is updated every 25ms
+     */
+    public void play()
+    {
+        while (true)
+        {
+            try { Thread.sleep(20); }
+            catch(InterruptedException e) {}
+            ball.move();
+            checkForCollision();
+            display.repaint();
+        }
+    }
+    
+    public static void main (String[] args)
+    {
+        Breakout breakout = new Breakout();
+        breakout.play();
+    }
+}

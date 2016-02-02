@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move element &apos;knowledge.txt&apos; to &apos;Binary Trees&apos;&#x0D;&#x0A;- Original project: &apos;Binary Trees&apos;&#x0D;&#x0A;- Destination element: &apos;Binary Trees&apos;&#x0D;&#x0A;- Original element: &apos;knowledge.txt&apos;&#x0D;&#x0A;- Update references to refactored element" description="Move file" destination="=Binary Trees" element1="src/knowledge.txt" files="1" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1363756161075" units="0" version="1.0"/>
+</session>

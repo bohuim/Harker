@@ -1,0 +1,68 @@
+import java.awt.*;
+import java.util.*;
+
+/**
+ * Represents a rectangular game board, containing Piece objects, through a BoundedGrid. </br></br>
+ * 
+ * <b>Methods</b>
+ * <ul>
+ * 		<li>{@code allMove(color)} returns a set of all moves available by Pieces of specified color </li>
+ *      <li>{@code executeMove(move)} executes a move by placing the specified Piece at the destination </li>
+ *      <li>{@code undoMove(move)} reverses a move by placing the specified Piece back to source location </li>
+ * </ul>
+ * 
+ * @author Dennis Moon
+ * @version Apr 29, 2013
+ * 
+ * @Revision
+ *     Apr 29, 2013 - class created and added allMoves()
+ *     May 10, 2013 - modified so that executeMove() & undoMove() are part of the Move class
+ *     May 10, 2013 - isUnderAttack() method added
+ */
+public class Board extends BoundedGrid<Piece>
+{
+	/**
+	 * <b>Constructor: </b>Board</br> 
+	 * <b>Usage: </b>{@code Board board = new Board()}</br>
+	 * -------------------------------</br>
+	 * Creates a new BoundedGrid of dimension 8x8, replicating a Chess board.
+	 */
+	public Board()
+	{
+		super(8, 8);
+	}
+
+	/**
+	 * <b>Method: </b>allMoves</br> 
+	 * <b>Usage: </b>{@code board.allMoves(color)}</br>
+	 * -------------------------------</br>
+	 * Returns a set of all moves possible by all Pieces of the specified color. </br>
+	 * Checks all occupied locations for the specified color and adds its possible destinations as new Moves to set. </br>
+	 * 
+	 * @param color of Pieces to get moves from
+	 * @return Set of all moves possible by Pieces of specified color
+	 */
+	public Set<Move> allMoves(Color color)
+	{
+	    Set<Move> set = new HashSet<Move>();
+	    for(Location loc : getOccupiedLocations())
+	    {
+	        Piece target = get(loc);
+	        if (target.getColor().equals(color))
+	        {
+	            Iterator<Location> it = target.destinations();
+	            while (it.hasNext())
+	                set.add(new Move(target, it.next()));
+	        }
+	    }
+	    return set;
+	}
+	
+	public boolean isUnderAttack(Color color, Location loc)
+	{
+	    for (Move move : allMoves(color))
+	        if (move.getDestination().equals(loc))
+	            return true;
+	    return false;
+	}
+}

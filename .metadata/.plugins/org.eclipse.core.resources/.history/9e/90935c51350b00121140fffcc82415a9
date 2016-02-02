@@ -1,0 +1,26 @@
+import java.util.*;
+
+public class Main 
+{	
+	public static void main (String [] args)
+	{
+		/**Instrument piano = new Instrument();
+		InputDataHandler handler = new InputDataHandler();
+		
+		new Thread (handler).start();
+		new Thread (piano).start();
+		
+		while (true)
+			piano.pluckNote(handler.getInput());*/
+	    
+	    Note A = new Note(Note.A,4);
+	    
+	    A.pluck();
+	    
+	    while(A.time()<10000)
+	    {
+	        AudioLib.play(A.sample());
+	        A.tic();
+	    }
+	}
+}

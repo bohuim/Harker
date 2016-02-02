@@ -1,0 +1,40 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: crossings
+*/
+public class crossings
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out, true);
+        
+//        BufferedReader f = new BufferedReader(new FileReader("relay.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("relay.out")));
+        
+        
+    }
+    
+    int a;
+    int b;
+    boolean safe;
+    
+    public crossings(int a, int b)
+    {
+        this.a = a;
+        this.b = b;
+    }
+    
+    public boolean safeFrom(crossings target)
+    {
+        if ((a<target.a) && (target.b<b))
+            return false;
+        if ((a<target.a && b<target.b) || (target.a<a && target.b<b))
+            return true;
+        return true;
+    }
+}

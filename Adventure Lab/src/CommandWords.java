@@ -1,0 +1,78 @@
+/**
+ * 
+ * @author Mr. Page
+ * @version 070111
+ * 
+ * This class encapsulates all of the known command words for the Hark text based
+ * adventure game.  It provides the following services:
+ *  isCommand(String test)  returns true if test is a valid command
+ *  showAll() prints out all of the commands to System.out
+ *  add(String test)  adds test as a valid command to this set of commands (private method)
+ *
+ */
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+
+public class CommandWords
+{
+    private static Set<String> validWords = new TreeSet<String>();
+    /**
+     * create a set of valid command words.  If the inputSet is null, use the default
+     * set needed for Zork.  Otherwise, copy the input set values.
+     * @param inputSet a set of valid command words or null
+     */
+    public static void initialize(Set<String> inputSet)
+    {
+        if(inputSet == null)
+        {
+            // set up the default set of words
+            validWords.add("go");
+            validWords.add("help");
+            validWords.add("quit");
+            validWords.add("take");
+            validWords.add("equip");
+            validWords.add("attack");
+            validWords.add("status");
+            validWords.add("use");
+            validWords.add("rest");
+            validWords.add("drop");
+            validWords.add("bag");
+            validWords.add("location");
+        }
+        else
+        {
+            for(String s : inputSet) validWords.add(s);
+        }
+    }
+    /**
+     * private utility function to add words to the set
+     * @param cmd the command word to be added
+     */
+    private static void add(String cmd)
+    {
+        validWords.add(cmd);
+    }
+    /**
+     * utility function which checks to see if the given word is a valid
+     * command (contained in the set)
+     * @param cmd the string to test
+     * @return true if cmd is valid, false otherwise
+     */
+    public static boolean isCommand(String cmd)
+    {
+       if(cmd != null) return validWords.contains(cmd);
+       return false;
+    }
+    /**
+     * utility function to get a string that represents al of the 
+     * command words
+     */
+    public static String showAll()
+    {
+        String out = "";
+        for(String s : validWords) out += s + ", ";
+        return out.substring(0, out.length()-1);
+    }
+    
+}

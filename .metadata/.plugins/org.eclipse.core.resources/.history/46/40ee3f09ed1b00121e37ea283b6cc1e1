@@ -1,0 +1,204 @@
+import java.util.ArrayList;
+
+/**
+ * Runs the whole game
+ * by making instances of a grid, pieces and updates the game
+ * 
+ * @author Dennis Moon
+ */
+public class Game
+{
+    private MyBoundedGrid<Block> grid;
+    private MyBoundedGrid<Block> holdGrid;
+    private MyBoundedGrid<Block> nextGrid;
+    private Control control;
+    private Display display;
+    private Piece p;
+    private Piece hold;
+    private Piece next;
+    
+    boolean switched;
+    boolean gameOver;
+    
+    public Game()
+    {
+        grid = new MyBoundedGrid<Block>(20, 10);
+        holdGrid = new MyBoundedGrid<Block>(6,5);
+        nextGrid = new MyBoundedGrid<Block>(6,5);
+        control = new Control(this);
+        display = new Display(grid, holdGrid, nextGrid);
+        //holdDisplay = new BlockDisplay(holdGrid);
+        //nextDisplay = new BlockDisplay(nextGrid);
+        display.setArrowListener(control);
+        hold = null;
+        
+        switched = false;
+        gameOver = false;
+    }
+    
+    /**
+     * Method: play()
+     * Usage: game.play()
+     * --------------------------
+     * the game in a while loop: every loop creates a new piece. Puts that piece into a block and switches control to that piece
+     * the user controls that piece while its in the grid and the spaces below it are null
+     * gravity is applied to that piece regularly
+     */
+    public void play()
+    {
+        while(!gameOver)
+        {
+            p = new Piece();
+            
+            p.putSelfInGrid(grid, new Location(0,4));
+            control.changeControl(p);
+            
+            while (p.moveValid(Location.SOUTH) && !atBottom())
+            {
+                int i = 0;
+                while (i<60000 && !p.settled())
+                {
+                    display.showBlocks(grid);
+                    i++;
+                }                
+                //applies gravity
+                control.downPressed();
+            }
+            for (int i=0; i<20000; i++){}
+            
+            p.settle(); 
+            for (int i=0; i<20000; i++)
+                display.showBlocks(grid);
+            clearRows();
+            display.showBlocks(grid);
+            checkGameOver();
+            switched = false;
+        }
+        display.showBlocks(grid);
+        System.out.println("Game Over!");
+    }
+    
+    public void switchHold()
+    {
+        if (!switched)
+        {
+            Piece temp = p;
+            
+            p.removeSelfFromGrid();      
+            
+            if (hold!=null)
+            {
+                hold.removeSelfFromGrid();
+                p = hold;
+            }
+            else
+                p = new Piece();
+            
+            hold = temp;
+            
+            p.putSelfInGrid(grid, new Location(0,4));
+            hold.putSelfInGrid(holdGrid, new Location(1,2));
+            
+            display.showBlocks(holdGrid);    
+            control.changeControl(p);
+            switched = true;
+        }
+    }
+    
+    /**
+     * Method: atBottom()
+     * Usage: boolean isAtBottom = piece.atBottom();
+     * ----------------------------------------------
+     * checks to see if all the blocks of a piece are not at the bottom
+     * if all 4 blocks are not at the bottom: returns false
+     * @return boolean - true if any of the blocks of a piece are in the last row
+     */
+    private boolean atBottom()
+    {
+        int valid = 0;
+        Location[] pieceCopy = p.getLocations();
+        for (Location l : pieceCopy)
+        {
+            if (l.getRow()<grid.getNumRows()-1)
+                valid++;
+        }
+        if (valid==4)
+            return false;
+        return true;
+    }
+    
+    /**
+     * Method: clearRows();
+     * Usage: clearRows();
+     * --------------------------
+     * checks to see if the bottom row is filled and clears it
+     * then moves everything down a row
+     * @param true if a row was cleared
+     */
+    private boolean rowFilled(int row)
+    {
+        int filled=0;
+        for (int c=0; c<grid.getNumCols(); c++)
+        {
+            if (grid.get(new Location(row,c))!=null)
+                filled++;
+        }
+        
+        if (filled==grid.getNumCols())
+            return true;
+        return false;
+    }
+    
+    /**
+     * Method: slideDown()
+     * Usage: slideDown();
+     * --------------------------
+     * slides all block shifted one down
+     * @param int - slides everything above this row down 1 row
+     */
+    private void slideDown(int row)
+    {
+        for (int c=0; c<grid.getNumCols(); c++)
+            grid.get(new Location(row,c)).removeSelfFromGrid();
+        for (int r=row-1; r>0; r--)
+        {
+            for (int c=0; c<grid.getNumCols(); c++)
+            {
+                Location loc = new Location(r,c);
+                if (grid.get(loc)!=null)
+                    grid.get(loc).moveTo(loc.getAdjacentLocation(Location.SOUTH));
+            }
+        }
+    }
+    
+    /**
+     * Method: clearRows()
+     * Usage: clearRows();
+     * ------------------------------
+     * starting from the bottom row, it checks if the row is filled
+     * and if it is, all block above that row are shifted down one row
+     */
+    private void clearRows()
+    {
+        for (int r=1; r<grid.getNumRows(); r++)
+        {
+            if (rowFilled(r)) slideDown(r);
+        }
+    }
+    
+    /**
+     * Method: checkGameOver()
+     * Usage: checkGameOver()
+     * -------------------------------------------
+     * checks whether the player lost or not
+     * sees if there are any blocks on the very top row
+     */
+    private void checkGameOver()
+    {
+        for(Location l : grid.getOccupiedLocations())
+        {
+            if (l.getRow()==0)
+                gameOver = true;
+        }
+    }
+}

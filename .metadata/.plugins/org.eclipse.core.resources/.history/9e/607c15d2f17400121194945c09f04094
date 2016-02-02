@@ -1,0 +1,189 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: perimeter
+*/
+public class perimeter
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out, true);
+        
+//        BufferedReader f = new BufferedReader(new FileReader("perimeter.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("perimeter.out")));
+        
+        perimeter p = new perimeter();
+        
+        Space[][] field = new Space[100][100];
+        for (int x=0; x<100; x++)
+            for (int y=0; y<100; y++)
+                field[x][y] = p.newSpace(Space.EMPTY, field, x, y);
+        
+        int n = Integer.parseInt(f.readLine());
+        for (int i=0; i<n; i++)
+        {
+            StringTokenizer st = new StringTokenizer(f.readLine());
+            field[Integer.parseInt(st.nextToken())-1][100-Integer.parseInt(st.nextToken())].type = Space.HAY;
+        }
+        
+        for (int x=0; x<100; x++)
+            for (int y=0; y<100; y++)
+            {
+                if (field[x][y].type==Space.HAY)
+                {
+                    if (x==0 || field[x-1][y].type==Space.EMPTY) 
+                        field[x][y].west = true;
+                    if (x==99 || field[x+1][y].type==Space.EMPTY)
+                        field[x][y].east = true;
+                    if (y==0 || field[x][y-1].type==Space.EMPTY)
+                        field[x][y].south = true;
+                    if (y==99|| field[x][y+1].type==Space.EMPTY)
+                        field[x][y].north = true;
+                }
+                else
+                    field[x][y].hole = field[x][y].isHole();
+            }
+    }
+    
+    public Space newSpace(int type, Space[][] field, int x, int y)
+    {
+        return new Space(type, field, x , y);
+    }
+    
+    class Space
+    {
+        public static final int HAY = 0;
+        public static final int EMPTY = 1;
+        
+        int type;
+        boolean north;
+        boolean east;
+        boolean south;
+        boolean west;
+        boolean hole;
+        
+        Space[][] field;
+        int x, y;
+        
+        Space(int aType, Space[][] field, int x, int y)
+        {
+            type = aType;
+            north = false;
+            east = false;
+            south = false;
+            west = false;
+            hole = false;
+            
+            this.field = field;
+            this.x = x;
+            this.y = y;
+        }
+        
+        public boolean isHole()
+        {
+            if (x==0 || x==99 || y==0 || y==99)
+                return false;
+            
+            boolean n = false;
+            boolean e = false;
+            boolean s = false;
+            boolean w = false;
+            if (field[x][y+1].type==Space.EMPTY)
+                n = field[x][y+1].holeHelpN();
+            if (field[x+1][y].type==Space.EMPTY)
+                e = field[x+1][y].holeHelpE();
+            if (field[x][y-1].type==Space.EMPTY)
+                s = field[x][y-1].holeHelpS();
+            if (field[x-1][y].type==Space.EMPTY)
+                w = field[x-1][y].holeHelpW();
+            
+            return (n&&e&&s&&w);
+        }
+        
+        private boolean holeHelpN()
+        {
+            if (x==0 || x==99 || y==0 || y==99)
+                return false;
+            
+            if (field[x][y+1].type==Space.HAY && field[x-1][y].type==Space.HAY && field[x][y+1].type==Space.HAY)
+                return true;
+            
+            boolean n = false;
+            boolean e = false;
+            boolean w = false;
+            
+            if (field[x][y+1].type==Space.EMPTY)
+                n = field[x][y+1].holeHelpN();
+            if (field[x+1][y].type==Space.EMPTY)
+                e = field[x+1][y].holeHelpE();
+            if (field[x-1][y].type==Space.EMPTY)
+                w = field[x-1][y].holeHelpW();
+            
+            return (n&&e&&w);
+        }
+        
+        private boolean holeHelpE()
+        {  
+            if (x==0 || x==99 || y==0 || y==99)
+                return false;
+            if (field[x][y+1].type==Space.HAY && field[x][y-1].type==Space.HAY && field[x+1][y].type==Space.HAY)
+                return true;
+            
+            boolean n = false;
+            boolean e = false;
+            boolean s = false;
+            if (field[x][y+1].type==Space.EMPTY)
+                n = field[x][y+1].holeHelpN();
+            if (field[x+1][y].type==Space.EMPTY)
+                e = field[x+1][y].holeHelpE();
+            if (field[x][y-1].type==Space.EMPTY)
+                s = field[x][y-1].holeHelpS();
+            
+            return (n&&e&&s&&e);
+        }
+        
+        private boolean holeHelpS()
+        {  
+            if (x==0 || x==99 || y==0 || y==99)
+                return false;
+            if (field[x][y-1].type==Space.HAY && field[x-1][y].type==Space.HAY && field[x][y+1].type==Space.HAY)
+                return true;
+            
+            boolean w = false;
+            boolean e = false;
+            boolean s = false;
+            if (field[x+1][y].type==Space.EMPTY)
+                e = field[x+1][y].holeHelpE();
+            if (field[x][y-1].type==Space.EMPTY)
+                s = field[x][y-1].holeHelpS();
+            if (field[x-1][y].type==Space.EMPTY)
+                w = field[x-1][y].holeHelpW();
+            
+            return (w&&e&&s);
+        }
+        
+        private boolean holeHelpW()
+        {  
+            if (x==0 || x==99 || y==0 || y==99)
+                return false;
+            if (field[x][y+1].type==Space.HAY && field[x-1][y].type==Space.HAY && field[x-1][y+1].type==Space.HAY)
+                return true;
+            
+            boolean w = false;
+            boolean n = false;
+            boolean s = false;
+            if (field[x][y+1].type==Space.EMPTY)
+                n = field[x][y+1].holeHelpN();
+            if (field[x][y-1].type==Space.EMPTY)
+                s = field[x][y-1].holeHelpS();
+            if (field[x-1][y].type==Space.EMPTY)
+                w = field[x-1][y].holeHelpS();
+            
+            return (w&&n&&s);
+        }
+    }
+}

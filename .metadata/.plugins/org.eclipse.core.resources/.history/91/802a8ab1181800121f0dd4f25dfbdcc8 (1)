@@ -1,0 +1,92 @@
+import java.awt.*;
+import java.util.ArrayList;
+import javax.swing.*;
+
+/**
+ * Gui of the piano project
+ * Has the 88 piano keys that are buttons
+ * but can also respond to keypress by user
+ * 
+ * @author Dennis Moon
+ */
+public class Keyboard
+{
+    private JFrame frame;
+    private JLabel display;
+    private JPanel keyboard;
+    private JButton[] keys;
+    
+    private Instrument piano;
+    
+    /**
+     * Constructor: Piano(instrument)
+     * Usage: Keyboard keyboard = new Keyboard();
+     * -------------------------------------------
+     * takes in an instrument and puts it into piano
+     */
+    public Keyboard(Instrument instr)
+    {
+        piano = instr;
+        
+        // schedule a job for the event-dispatching thread to
+        // create and show this GUI
+        SwingUtilities.invokeLater(new Runnable()
+        {
+            public void run()
+            {
+                createAndShowGUI();
+            }
+        });
+        
+        // wait until the display has been drawn
+        try
+        {
+            while(frame == null || !frame.isVisible())
+                Thread.sleep(1);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+    
+    /**
+     * Method: createAndShowGUI()
+     * Usage: createAndShowGUI();
+     * -----------------------------
+     */
+    private void createAndShowGUI()
+    {
+        frame = new JFrame("Piano");
+        keyboard = new JPanel();
+        JButton j = new JButton();
+        JButton j1 = new JButton();
+        
+        frame.setLayout(null);
+        keyboard.setLayout(null);
+        
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(400,200);
+        frame.setVisible(true);
+        frame.setFocusable(true);
+        
+        frame.add(keyboard);
+        keyboard.setSize((new Dimension(400,200)));
+        
+        keyboard.add(j);
+        j.setSize(20, 100);
+        j.setLocation(0, 0);
+        keyboard.setComponentZOrder(j, 0);
+        
+        keyboard.add(j1);
+        j1.setSize(20, 80);
+        j1.setLocation(10, 0);
+        keyboard.setComponentZOrder(j1, -1);
+        
+        j.setPreferredSize(new Dimension(20,100));
+        keyboard.add(j);
+        
+        keys = new JButton[88];
+    }  
+}

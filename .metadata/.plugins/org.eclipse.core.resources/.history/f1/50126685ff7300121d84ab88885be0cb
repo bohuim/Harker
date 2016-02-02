@@ -1,0 +1,63 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: friday
+*/
+public class friday
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new FileReader("friday.in"));
+        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("friday.out")));
+        
+        int n = Integer.parseInt(f.readLine());
+        int[] count = new int[7];
+        int day = 2; //Saturday = 0
+        
+        for (int year=1900; year<1900+n; year++)
+        {
+            boolean leap = false;
+            if (year%100==0 && year%400==0) 
+                leap = true;
+            else if (year%4==0)
+            
+            for (int month=1; month<=12; month++)
+            {
+                int number;
+                if (month==1 || month==3 || month==5 || month==7 || month==8 || month==10 || month==12)
+                    number = 31;
+                else if (month==2 && leap)
+                    number = 29;
+                else if (month==2 && !leap)
+                    number = 28;
+                else
+                    number = 30;
+                
+                for (int date=1; date<=number; date++)
+                {
+                    if (date==13)
+                        count[day]++;
+                    day = friday.whatDay(day);
+                }
+            }
+        }
+        
+       for (int i=0; i<6; i++)
+           out.print(count[i] + " ");
+       out.print(count[6]);
+       out.println();
+       out.close();
+       System.exit(0);
+    }
+    
+    public static int whatDay(int day)
+    {
+        day++;
+        if (day==7)
+            day = 0;
+        return day;
+    }
+}

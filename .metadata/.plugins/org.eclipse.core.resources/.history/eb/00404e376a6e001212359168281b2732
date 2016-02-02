@@ -1,0 +1,18 @@
+
+/**
+ * 
+ *
+ * @author Dennis
+ */
+public class Draw
+{
+    public static void main(String[] args)
+    {
+        ComplexNum a = new ComplexNum(2, 1);
+        ComplexNum b = new ComplexNum(3, 2);
+       
+        System.out.println(a.toString());
+        System.out.println(b.toString());
+        System.out.println(ComplexNum.add(a, b).toString());
+    }
+}

@@ -1,0 +1,52 @@
+import java.io.*;
+import java.util.*;
+
+/*
+ID: 14DennisM
+LANG: JAVA
+TASK: perimeter
+*/
+public class perimeter
+{
+    public static void main(String[] args) throws IOException
+    {
+        BufferedReader f = new BufferedReader(new InputStreamReader(System.in));
+        PrintWriter out = new PrintWriter(System.out, true);
+        
+//        BufferedReader f = new BufferedReader(new FileReader("perimeter.in"));
+//        PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("perimeter.out")));
+        
+        perimeter p = new perimeter();
+        
+        Space[][] field = new Space[100][100];
+        int n = Integer.parseInt(f.readLine());
+        Space[] list = new Space[n];
+        for (int i=0; i<n; i++)
+        {
+            StringTokenizer st = new StringTokenizer(f.readLine());
+            int x = Integer.parseInt(st.nextToken())-1;
+            int y = 100-Integer.parseInt(st.nextToken());
+            list[i] = p.newSpace(x,y);
+            field[x][y] = list[i];
+        }
+        
+        for (int i=0; i<n; i++)
+            if (list[i])
+        
+    }
+    
+    public Space newSpace()
+    {
+        return new Space();
+    }
+    
+    class Space
+    {
+        int x, y;
+        Space(int a, int b)
+        {
+            x = a;
+            y = b;
+        }
+    }
+}

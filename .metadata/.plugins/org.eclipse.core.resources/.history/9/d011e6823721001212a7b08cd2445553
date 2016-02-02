@@ -1,0 +1,49 @@
+import javax.swing.*;
+
+/**
+ * Fancier display of the tetris game
+ * 
+ * @author Dennis
+ */
+public class Display
+{
+    private JFrame frame;
+    private JPanel centerPanel;
+    private JPanel leftPanel;
+    private JPanel bottomLeftPanel;
+    private JPanel rightPanel;
+    private JLabel score;
+    
+    private JPanel gamePanel;
+    private MyBoundedGrid<Block> gameBoard;
+    private JPanel[][] gameGrid;
+    
+    private JPanel holdPanel;
+    private MyBoundedGrid<Block> holdBoard;
+    private JPanel[][] holdGrid;
+    
+    private JPanel nextMainPanel;
+    private JPanel otherNextPanel;
+    private MyBoundedGrid[] nextBoards;
+    private JPanel[][][] nextGrids;
+    
+    private JLabel level;
+    private JLabel linesCleard;
+    
+    /**
+     * Constructor: Display(tetrisBoard, holdBoard, nextBoardArray)
+     * Usage: Display display = new Display(tetrisBoard, holdBoard, nextBoardArray);
+     * -------------------------------------------------------------------------------
+     * @param gameB - main tetris game board
+     * @param holdB - board hold tetrad goes in
+     * @param nextB - board the next tetrads are stored in
+     */
+    public Display(MyBoundedGrid<Block> gameB, MyBoundedGrid<Block> holdB, MyBoundedGrid<Block>[] nextB)
+    {
+        gameBoard = gameB;
+        holdBoard = holdB;
+        nextBoards = nextB;
+        
+        
+    }
+}

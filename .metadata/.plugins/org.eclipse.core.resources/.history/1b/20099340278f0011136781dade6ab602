@@ -1,0 +1,34 @@
+
+/**
+ * Write a description of class Guitar here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+public class Guitar
+{
+    private WordGameDisplay display;
+    
+    private String userInput;
+    
+    private GuitarString E = new GuitarString(330);
+    private GuitarString B = new GuitarString(247);
+    private GuitarString G = new GuitarString(196);
+    private GuitarString D = new GuitarString(147);
+    private GuitarString A = new GuitarString(110);
+    
+    public Guitar()
+    {
+        display = new WordGameDisplay();
+    }
+    
+    public void fretBoard()
+    {
+        userInput = display.getGuess().toLowerCase();
+        if (userInput.equals("e")) E.playNote();
+        else if (userInput.equals("b")) B.playNote();
+        else if (userInput.equals("g")) G.playNote();
+        else if (userInput.equals("d")) D.playNote();
+        else if (userInput.equals("a")) A.playNote();
+    }
+}

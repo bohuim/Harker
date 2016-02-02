@@ -1,0 +1,37 @@
+
+/**
+ * 
+ * @author Dennis Moon
+ * @version Mar 9, 2013
+ * 
+ * @Revision:
+ *     Mar 9, 2013 - class created
+ */
+public class Move
+{
+    private int target;
+    private int destination;
+    private int num;
+    
+    public Move(int t, int d, int n)
+    {
+        target = t;
+        destination = d;
+        num = n;
+    }
+    
+    public int getTaget()
+    {
+        return target;
+    }
+    
+    public int getDestination()
+    {
+        return destination;
+    }
+    
+    public int getNumber()
+    {
+        return num;
+    }
+}

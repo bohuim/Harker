@@ -1,0 +1,75 @@
+
+/**
+ * A class that can make and play multiple guitar strings
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+public class Instrument implements Runnable
+{   
+    /**Keyboard layout
+     * 
+     * Notes:C  C#  D  D#  E  F  F#  G  G#  A  Bb  B  C  C#  D  D#  E
+     * Keys: a  w   s  e   d  f  t   g  y   h  u   j  k  o   l  p   ;
+     */
+    
+    private double sum;
+    private Note[] note;
+    
+    public Instrument()
+    {
+    	sum = 0;
+    	note = new Note[13];
+    	for (int i=0; i<note.length; i++)
+    	    note[i] = new Note(i+3,3);
+    }
+   
+    /**
+     * converts the key into the note and plucks it
+     * 
+     * @param h - key the player pressed
+     */
+    public void playNote(String h)
+    {
+        if (h.equals("a")) note[0].pluck();
+        else if (h.equals("w")) note[1].pluck();
+        else if (h.equals("s")) note[2].pluck();
+        else if (h.equals("e")) note[3].pluck();
+        else if (h.equals("d")) note[4].pluck();
+        else if (h.equals("f")) note[5].pluck();
+        else if (h.equals("t")) note[6].pluck();
+        else if (h.equals("g")) note[7].pluck();
+        else if (h.equals("y")) note[8].pluck();
+        else if (h.equals("h")) note[9].pluck();
+        else if (h.equals("u")) note[10].pluck();
+        else if (h.equals("j")) note[11].pluck();
+        else if (h.equals("k")) note[12].pluck();
+    }
+    
+    private void update()
+    {
+        sum = 0;
+        for (int i=0; i<note.length; i++)
+        {
+            sum += note[i].sample();
+            note[i].tic();
+            if (note[i].sample()>6000)
+                note[i].silence();
+        }
+    }
+    
+    /**constantly run in a separate thread
+     * it calls update
+     * then plays the sum update changed it
+     * @param none
+     * @return none
+     */
+    public void run()
+    {
+    	while (true)
+    	{
+    		update();
+    		AudioLib.play(sum);
+    	}
+    }
+}
